@@ -20,8 +20,8 @@ Master to Master
 - b [IP~PORT ...] : updated backup masters list each backup formatted as IP~PORT
 
 Master to Self
-- r : request to pair producer with consumer, sent upon receiving a 'c' (ProcessAcceptorMessages)
-- a : adds a consumer to list of consumers, sent upon receiving a 'k' (ProcessAcceptorMessages)
+- r : request to pair producer with consumers
+- a : adds a consumer to list of consumers
 
 Master to Aggregator:
 - t NUMVECTORS K(for top k) : tells aggregator how many vectors it needs
@@ -31,7 +31,8 @@ Consumer to Master
 
 ===================================================
 Producer to Master
-- p : request to get consumers
+- p : request to get consumers, serves as identifying message
+- r : request to pair producer with consumers
 - q ID : query master to get category for given ID
 
 Producer to Consumer
