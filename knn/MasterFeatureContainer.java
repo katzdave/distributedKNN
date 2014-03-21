@@ -6,8 +6,13 @@
 
 package knn;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * What the master uses to store all of the features indexed by ConsumerId
@@ -46,7 +51,8 @@ public class MasterFeatureContainer {
     TestResult.put(new Integer(LastTestId), null);
   }
   
-  //NOTE: Will return null if test incomplete or invalidid
+  //NOTE: Will return null if test incomplete or invalid
+  //Not sure if these cases being indistinguishable is a problem
   public String GetTestResult(int id){
     if(!TestResult.containsKey(id)){
       //INVALID ID
@@ -54,5 +60,51 @@ public class MasterFeatureContainer {
     }else{
       return TestResult.get(id);
     }
+  }
+  
+  public boolean ExportCurrentResultsToTextFile(String filename){
+    int[][] results = new int[10][10];
+    for (int[] row : results)
+      Arrays.fill(row, 0);
+    for (Map.Entry<Integer, String> entry : TestResult.entrySet()) {
+      Integer key = entry.getKey();
+      String learnedValue = entry.getValue();
+      String knownValue = TestData.get(key).Category;
+      if(learnedValue != null && knownValue != null){
+        results[Integer.parseInt(knownValue)][Integer.parseInt(learnedValue)]++;
+      }
+    }
+    int totalCorrect = 0;
+    int total = 0;
+    for(int i=0; i<10; i++){
+      for(int j=0; j<10; j++){
+        if(i == j){
+          totalCorrect += results[i][j];
+        }
+        total += results[i][j];
+      }
+    }
+    double overallAccuracy = (double)totalCorrect * 100 / (double)total;
+    
+    try{
+      PrintWriter out = new PrintWriter(new FileWriter(filename));
+      out.println(String.format(
+              "%d Total Results, %d Correct: %.2f% Percent Accuracy",
+              total, totalCorrect, overallAccuracy));
+      out.println();
+      out.println("Confusion matrix: Rows actual, Columns predicted");
+      out.println("\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t");
+      for(int i=0; i<10; i++){
+        out.print(i + "\t");
+        for(int j=0; j<10; j++){
+          out.println(results[i][j] + "\t");
+        }
+        out.println();
+      }
+      
+    }catch(IOException e){
+      return false;
+    }
+    return true;
   }
 }
