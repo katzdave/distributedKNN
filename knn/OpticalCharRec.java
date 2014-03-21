@@ -22,7 +22,7 @@ public class OpticalCharRec {
     String testFilename = "optdigits.tes";
     //String testFilename = "custom.tes";
     
-    FeatureContainer fc = new FeatureContainer();
+    FeatureVectorContainer fc = new FeatureVectorContainer();
     BufferedReader br = null;
  
     try {

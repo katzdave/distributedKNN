@@ -21,8 +21,8 @@ import java.util.PriorityQueue;
  * @author david
  */
 public class CategoryFinder {
-  static int K = FeatureContainer.K;
-  static String VectorDelim = FeatureContainer.VectorDelim;
+  static int K = FeatureVectorContainer.K;
+  static String VectorDelim = FeatureVectorContainer.VectorDelim;
   PriorityQueue<CategoryDistances> Matches;
   
   public CategoryFinder(){

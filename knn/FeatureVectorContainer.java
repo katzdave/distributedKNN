@@ -18,14 +18,14 @@ import java.util.concurrent.PriorityBlockingQueue;
  * Long lived.  Run on each consumer.
  * @author David
  */
-public class FeatureContainer {
+public class FeatureVectorContainer {
   static int K = 5;
   static String VectorDelim = "-";
   static int NumWorkers = 4;
   
   List<FeatureVector> Vectors;
   
-  public FeatureContainer(){
+  public FeatureVectorContainer(){
     Vectors = new ArrayList<>();
   }
     
