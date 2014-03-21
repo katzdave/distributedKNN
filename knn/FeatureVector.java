@@ -6,13 +6,11 @@
 
 package knn;
 
-import java.util.Comparator;
-import java.lang.Math;
 /**
  *
  * @author David
  */
-public class FeatureVector implements Comparable<FeatureVector>{
+public class FeatureVector{
   static int NumFeatures = 64;
   static String Delim = "_";
   static String Delim2 = "!";
@@ -45,9 +43,8 @@ public class FeatureVector implements Comparable<FeatureVector>{
         System.err.println("Invalid string 2");
         System.exit(1);
       }else{
-        CurrDistance = Double.parseDouble(strings2[0]);
-        for(int i=1; i<=NumFeatures; i++){
-          Features[i-1] = new Feature(Double.parseDouble(strings2[i]));
+        for(int i=0; i<NumFeatures; i++){
+          Features[i] = new Feature(Double.parseDouble(strings2[i]));
         }
       }
     }else{
@@ -67,15 +64,6 @@ public class FeatureVector implements Comparable<FeatureVector>{
   }
   
   @Override
-  public int compareTo(FeatureVector other){
-    if(this.CurrDistance - other.CurrDistance > 0)
-      return 1;
-    else if(this.CurrDistance - other.CurrDistance < 0)
-      return -1;
-    return 0;
-  }
-  
-  @Override
   public String toString(){
     String out = "";
     for(int i=0; i<NumFeatures; i++){
@@ -87,7 +75,7 @@ public class FeatureVector implements Comparable<FeatureVector>{
   
   // This one includes the current distance
   public String toStringLong(){
-    String out = Category + Delim2 + CurrDistance + Delim;
+    String out = Category + Delim2;
     for(int i=0; i<NumFeatures; i++){
       out += Features[i].toString() + Delim;
     }

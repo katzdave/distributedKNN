@@ -19,8 +19,8 @@ public class OpticalCharRec {
   
   public void DoStuff(){
     String trainingFilename = "optdigits.tra";
-    //String testFilename = "optdigits.tes";
-    String testFilename = "custom.tes";
+    String testFilename = "optdigits.tes";
+    //String testFilename = "custom.tes";
     
     FeatureContainer fc = new FeatureContainer();
     BufferedReader br = null;
@@ -60,8 +60,7 @@ public class OpticalCharRec {
           fv.Features[i] = new Feature(Double.parseDouble(splat[i]));
         }
         CategoryFinder cf = new CategoryFinder();
-        fc.GetKnn(fv);
-        String s = fc.KnearestToString();
+        String s = fc.GetKnnAsString(fv);
         cf.AddListFromString(s);
         String category = cf.GetCategory();
         

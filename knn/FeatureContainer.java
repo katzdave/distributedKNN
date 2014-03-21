@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.PriorityBlockingQueue;
 /**
  * Long lived.  Run on each consumer.
  * @author David
@@ -17,39 +20,36 @@ import java.util.Random;
 public class FeatureContainer {
   static int K = 10;
   static String VectorDelim = "-";
+  static int NumWorkers = 4;
   
   List<FeatureVector> Vectors;
-  List<FeatureVector> Knearest;
   
   public FeatureContainer(){
     Vectors = new ArrayList<>();
-    Knearest = new ArrayList<>();
   }
-  
-  public void GetKnn(FeatureVector fv){
-    PriorityQueue<FeatureVector> pq = new PriorityQueue<>();
-    Knearest.clear();
-    for(int i=0; i<Vectors.size(); i++){
-      Vectors.get(i).GetEuclidianDistance(fv);
-      pq.add(Vectors.get(i));
+    
+  public String GetKnnAsString(FeatureVector fv){
+    PriorityBlockingQueue<CategoryDistances> pbq = new PriorityBlockingQueue<>();
+    ExecutorService pool = Executors.newFixedThreadPool(NumWorkers);
+    String outp = "";
+    
+    for(FeatureVector elem : Vectors){
+      pool.execute(new EuclideanWorker(elem, fv, pbq));
+    }
+    pool.shutdown();
+    while(!pool.isTerminated()){
+      ;
     }
     
     for(int i=0; i<K; i++){
-      FeatureVector feat = pq.poll();
-      if(feat == null){
+      CategoryDistances cd = pbq.poll();
+      if(cd == null){
         break;
       }
-      Knearest.add(feat);
+      outp += cd.toString() + VectorDelim;
     }
-  }
-  
-  public String KnearestToString(){
-    String s = "";
-    for(int i=0; i<Knearest.size(); i++){
-      s += Knearest.get(i).toStringLong() + VectorDelim;
-    }
-    return s.substring(0, s.length()-1);
-    //return s.replaceAll(VectorDelim + "$", "");
+    
+    return outp.substring(0, outp.length()-1);
   }
   
   public void AddVector(FeatureVector fv){

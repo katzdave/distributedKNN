@@ -22,7 +22,7 @@ import java.util.PriorityQueue;
 public class CategoryFinder {
   static int K = FeatureContainer.K;
   static String VectorDelim = FeatureContainer.VectorDelim;
-  PriorityQueue<FeatureVector> Matches;
+  PriorityQueue<CategoryDistances> Matches;
   
   public CategoryFinder(){
     Matches = new PriorityQueue<>();
@@ -31,22 +31,22 @@ public class CategoryFinder {
   public void AddListFromString(String s){
     String[] strings = s.split(VectorDelim);
     for (String string : strings) {
-      Matches.add(new FeatureVector(string));
+      Matches.add(new CategoryDistances(string));
     }
   }
   
   public String GetCategory(){
     HashMap<String,Integer> counts = new HashMap<>();    
     for(int i=0; i<K; i++){
-      FeatureVector fv = Matches.poll();
-      if(fv == null){
+      CategoryDistances cd = Matches.poll();
+      if(cd == null){
         break;
       }
-      if(counts.containsKey(fv.Category)){
-        Integer tmp = counts.get(fv.Category);
-        counts.put(fv.Category, new Integer(tmp.intValue()+1));
+      if(counts.containsKey(cd.Category)){
+        Integer tmp = counts.get(cd.Category);
+        counts.put(cd.Category, new Integer(tmp.intValue()+1));
       }else{
-        counts.put(fv.Category, new Integer(1));
+        counts.put(cd.Category, new Integer(1));
       }
     }
     String cat = "";
