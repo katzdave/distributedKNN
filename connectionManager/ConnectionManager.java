@@ -66,6 +66,7 @@ public class ConnectionManager {
    * continuously attempts to process queued incomingMessages
    */
   public void runManager() {
+    protocol.connect();
     scAcceptor.start();
     sMessenger.start();
     System.out.println("Connection Manager running");
