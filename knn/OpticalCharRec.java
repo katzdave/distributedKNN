@@ -12,7 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /**
- *
+ * Main Test Suite for reading the files and whatnot
  * @author david
  */
 public class OpticalCharRec {

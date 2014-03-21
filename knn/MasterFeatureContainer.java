@@ -7,7 +7,7 @@
 package knn;
 
 /**
- *
+ * What the master uses to store all of the features indexed by ConsumerId
  * @author david
  */
 public class MasterFeatureContainer {

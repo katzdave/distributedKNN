@@ -7,7 +7,7 @@
 package knn;
 
 /**
- *
+ * Stores the category and information about all features
  * @author David
  */
 public class FeatureVector{
@@ -17,7 +17,6 @@ public class FeatureVector{
   
   Feature[] Features;
   String Category;
-  double CurrDistance;
   
   public FeatureVector(){
     Features = new Feature[NumFeatures];
@@ -58,9 +57,7 @@ public class FeatureVector{
     for(int i=0; i<NumFeatures; i++){
       dist += Math.pow(this.Features[i].Value - other.Features[i].Value,2);
     }
-    dist = Math.pow(dist, .5);
-    CurrDistance = dist;
-    return dist;
+    return Math.pow(dist, .5);
   }
   
   @Override

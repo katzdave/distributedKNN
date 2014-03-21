@@ -7,7 +7,7 @@
 package knn;
 
 /**
- *
+ * This thing stores categories and distances for transmission to accumulator
  * @author david
  */
 public class CategoryDistances implements Comparable<CategoryDistances>{

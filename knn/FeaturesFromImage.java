@@ -13,7 +13,9 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 /**
- *
+ * Not sure if this one is sticking around.
+ * Gets a feature vector from a buffered image
+ * Will probably just add to constructor of FeatureVector
  * @author david
  */
 public class FeaturesFromImage {

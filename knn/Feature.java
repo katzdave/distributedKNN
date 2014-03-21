@@ -7,7 +7,7 @@
 package knn;
 
 /**
- *
+ * Feature.  For now just a double.  Can expand at some point if necessary
  * @author David
  */
 public class Feature {

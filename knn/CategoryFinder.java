@@ -16,6 +16,7 @@ import java.util.PriorityQueue;
  *
  * This class is a short lived class
  * This class will find the top K of many lists of individual box top K
+ * This is what the accumulator uses
  * 
  * @author david
  */

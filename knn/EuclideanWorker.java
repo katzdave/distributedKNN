@@ -9,7 +9,7 @@ package knn;
 import java.util.concurrent.PriorityBlockingQueue;
 
 /**
- *
+ * Worker class for multithreading of finding all euclidean distances
  * @author david
  */
 public class EuclideanWorker implements Runnable{

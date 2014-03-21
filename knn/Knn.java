@@ -10,7 +10,7 @@ import java.util.Random;
 import java.util.List;
 
 /**
- *
+ * Main class test suite
  * @author David
  */
 public class Knn {
