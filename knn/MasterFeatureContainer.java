@@ -14,7 +14,25 @@ import java.util.List;
  * @author david
  */
 public class MasterFeatureContainer {
-  HashMap<Integer, List<FeatureVector>> TrainingData;
+  HashMap<Integer, List<FeatureVector>> TrainingData = new HashMap<>();
+  int NumConsumers = 0; // Increment this each time a consumer connects?
   
-  
+  public void LoadAndDistributeTrainingDataEqually(String filename){
+    FeatureVectorLoader fvl = new FeatureVectorLoader();
+    List<FeatureVector> allTraining = fvl.FeatureVectorsFromTextFile(filename);
+    int amt = allTraining.size()/NumConsumers;
+    int rem = allTraining.size()%NumConsumers;
+    int last = 0;
+    int curr = 0;
+    
+    for(int i=0; i<NumConsumers; i++){
+      curr = last + amt;
+      if(rem > 0){
+        curr++;
+        rem--;
+      }
+      TrainingData.put(new Integer(i), allTraining.subList(last, curr));
+      curr = last;
+    }
+  }  
 }

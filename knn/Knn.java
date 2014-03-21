@@ -49,8 +49,5 @@ public class Knn {
     
     OpticalCharRec ocr = new OpticalCharRec();
     ocr.DoStuff();
-    
-//    FeaturesFromImage ffi = new FeaturesFromImage();
-//    ffi.DoStuff();
   }
 }
