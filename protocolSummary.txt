@@ -21,7 +21,6 @@ Master to Master
 
 Master to Self
 - r : request to pair producer with consumers
-- a : adds a consumer to list of consumers
 
 Master to Aggregator:
 - t NUMVECTORS K(for top k) : tells aggregator how many vectors it needs
