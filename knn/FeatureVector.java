@@ -6,14 +6,16 @@
 
 package knn;
 
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+
 /**
  * Stores the category and information about all features
  * @author David
  */
 public class FeatureVector{
   static int NumFeatures = 64;
-  static String Delim = "_";
-  static String Delim2 = "!";
+  static String Delim = ",";
   
   Feature[] Features;
   String Category;
@@ -24,31 +26,32 @@ public class FeatureVector{
   
   public FeatureVector(String s){
     Features = new Feature[NumFeatures];
-    String[] strings = s.split(Delim2);
-    if(strings.length == 1){
-      String[] strings2 = strings[0].split(Delim);
-      if(strings2.length != NumFeatures){
-        System.err.println("Invalid string 1");
-        System.exit(1);
-      }else{
-        for(int i=0; i<NumFeatures; i++){
-          Features[i] = new Feature(Double.parseDouble(strings2[i]));
-        }
-      }
-    }else if(strings.length == 2){
-      Category = strings[0];
-      String[] strings2 = strings[1].split(Delim);
-      if(strings2.length != NumFeatures + 1){
-        System.err.println("Invalid string 2");
-        System.exit(1);
-      }else{
-        for(int i=0; i<NumFeatures; i++){
-          Features[i] = new Feature(Double.parseDouble(strings2[i]));
-        }
-      }
+    String[] strings = s.split(Delim);
+    for(int i=0; i<NumFeatures; i++){
+      Features[i] = new Feature(Double.parseDouble(strings[i]));
+    }
+    if(strings.length > NumFeatures){
+      Category = strings[NumFeatures];
     }else{
-      System.err.println("Invalid string 3");
-      System.exit(1);
+      Category = null;
+    }
+  }
+  
+  public FeatureVector(BufferedImage img, String s){
+    Category = s;
+    for(int i=0; i<8; i++){
+      for(int j=0; j<8; j++){
+        int count = 0;
+        for(int k=0; k<4; k++){
+          for(int h=0; h<4; h++){
+            Color c = new Color(img.getRGB(j*4+k, i*4+h));
+            if(c.getBlue()+c.getGreen()+c.getRed() < 350){
+              count++;
+            }
+          }
+        }
+        Features[i*8 + j] = new Feature(count);
+      }
     }
   }
   
@@ -59,6 +62,14 @@ public class FeatureVector{
     }
     return Math.pow(dist, .5);
   }
+    
+  public String toStringShort(){
+    String out = "";
+    for(int i=0; i<NumFeatures; i++){
+      out += Features[i].toString() + Delim;
+    }
+    return out.substring(0, out.length()-1);
+  }
   
   @Override
   public String toString(){
@@ -66,17 +77,6 @@ public class FeatureVector{
     for(int i=0; i<NumFeatures; i++){
       out += Features[i].toString() + Delim;
     }
-    return out.substring(0, out.length()-1);
-    //return out.replaceAll(Delim + "$", "");
-  }
-  
-  // This one includes the current distance
-  public String toStringLong(){
-    String out = Category + Delim2;
-    for(int i=0; i<NumFeatures; i++){
-      out += Features[i].toString() + Delim;
-    }
-    return out.substring(0, out.length()-1);
-    //return out.replaceAll(Delim + "$", "");
+    return out + Category;
   }
 }

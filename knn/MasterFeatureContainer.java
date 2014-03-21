@@ -6,10 +6,15 @@
 
 package knn;
 
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * What the master uses to store all of the features indexed by ConsumerId
  * @author david
  */
 public class MasterFeatureContainer {
+  HashMap<Integer, List<FeatureVector>> TrainingData;
+  
   
 }
