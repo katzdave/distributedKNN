@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package connectionManager;
 
 import java.io.BufferedReader;
@@ -17,10 +11,10 @@ import java.util.concurrent.ConcurrentMap;
  */
 public abstract class Protocol {
   
-  Boolean isrunning;
-  ConcurrentMap<Integer, Socket> sockets;
-  BlockingQueue<Message> incomingMessages;
-  BlockingQueue<Message> outgoingMessages;
+  public Boolean isrunning;
+  public ConcurrentMap<Integer, Socket> sockets;
+  public BlockingQueue<Message> incomingMessages;
+  public BlockingQueue<Message> outgoingMessages;
   
   /**
    * 
@@ -35,7 +29,7 @@ public abstract class Protocol {
    * returns true if the connection should be established
    * false otherwise
    */
-  boolean processAcceptorMessages(int numConnections, 
+  public boolean processAcceptorMessages(int numConnections, 
                                   BufferedReader incomingStream, 
                                   Socket cSocket) {
     throw new UnsupportedOperationException("Not supported yet.");
@@ -48,7 +42,7 @@ public abstract class Protocol {
    * connectedID is the id number the sockets are keyed by
    * message is a string
    */
-  void processManagerMessages(Message message) {
+  public void processManagerMessages(Message message) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
@@ -56,7 +50,7 @@ public abstract class Protocol {
    * Handles disconnection logic
    * @param connectedID
    */
-  void handleDisconnection(int connectedID) {
+  public void handleDisconnection(int connectedID) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
@@ -83,15 +77,15 @@ public abstract class Protocol {
    * Functionality for connecting to a network
    * By default does nothing
    */
-  void connect() {
+  public void connect() {
     
   }
-
+  
   /**
    * Functionality to initialize other classes encapsulated within protocol
    * Protocol will already have access to running, sockets, incomingMessages, and outgoingMessages
    */
-  void initialize() {
+  public void initialize() {
 
   }
   
