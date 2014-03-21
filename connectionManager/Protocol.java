@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package masterserver;
+package connectionManager;
 
 import java.io.BufferedReader;
 import java.net.Socket;
@@ -85,6 +85,14 @@ public abstract class Protocol {
    */
   void connect() {
     
+  }
+
+  /**
+   * Functionality to initialize other classes encapsulated within protocol
+   * Protocol will already have access to running, sockets, incomingMessages, and outgoingMessages
+   */
+  void initialize() {
+
   }
   
 }

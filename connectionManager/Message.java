@@ -1,4 +1,4 @@
-package masterserver;
+package connectionManager;
 
 public class Message {
   public int connectedID;

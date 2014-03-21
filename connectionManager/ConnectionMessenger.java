@@ -1,4 +1,4 @@
-package masterserver;
+package connectionManager;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

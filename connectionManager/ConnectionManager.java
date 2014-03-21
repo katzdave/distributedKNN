@@ -10,7 +10,7 @@
  *
  */
 
-package masterserver;
+package connectionManager;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -59,6 +59,7 @@ public class ConnectionManager {
     sMessenger = new ConnectionMessenger(isrunning,
                                          sockets,
                                          outgoingMessages);
+    protocol.initialize();
   }
   
   /**
