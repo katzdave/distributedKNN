@@ -6,8 +6,6 @@
 
 package imageconsumer;
 
-import imageprocessing.*;
-
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Collection;

@@ -25,9 +25,9 @@ import knn.FeatureVectorLoader;
  * @author david
  */
 public class MasterKnnWrapper {
-  HashMap<Integer, List<FeatureVector>> TrainingData = new HashMap<>();
-  HashMap<Integer, FeatureVector> TestData = new HashMap<>();
-  HashMap<Integer, String> TestResult = new HashMap<>();
+  HashMap<Integer, List<FeatureVector>> TrainingData;
+  HashMap<Integer, FeatureVector> TestData;
+  HashMap<Integer, String> TestResult;
   ConcurrentMap<Integer, String> consumerConnectionData;
   BlockingQueue<Message> outgoingMessages;
   

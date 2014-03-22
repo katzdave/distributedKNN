@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
@@ -23,10 +24,24 @@ import java.util.PriorityQueue;
 public class CategoryFinder {
   static int K = FeatureVectorContainer.K;
   static String VectorDelim = FeatureVectorContainer.VectorDelim;
-  PriorityQueue<CategoryDistances> Matches;
+  PriorityBlockingQueue<CategoryDistances> Matches;
   
-  public CategoryFinder(){
-    Matches = new PriorityQueue<>();
+  public int ID;
+  int NumConsumers;
+  AtomicInteger CurrentConsumersCompleted;
+  
+  public CategoryFinder(int numConsumers){
+    Matches = new PriorityBlockingQueue<>();
+    CurrentConsumersCompleted = new AtomicInteger(0);
+    NumConsumers = numConsumers;
+  }
+  
+  public CategoryFinder(int id, int numConsumers, int k){
+    Matches = new PriorityBlockingQueue<>();
+    CurrentConsumersCompleted = new AtomicInteger(0);
+    NumConsumers = numConsumers;
+    ID = id;
+    K = k;
   }
   
   public void AddListFromString(String s){
@@ -34,6 +49,11 @@ public class CategoryFinder {
     for (String string : strings) {
       Matches.add(new CategoryDistances(string));
     }
+    CurrentConsumersCompleted.incrementAndGet();
+  }
+  
+  public boolean CheckIfAllMessagesReceived(){
+    return NumConsumers == CurrentConsumersCompleted.get();
   }
   
   public String GetCategory(){
