@@ -33,6 +33,9 @@ Master to accumulator:
 Consumer to Master
 - c PORT : identifying message to master upon connection to master serversocket
 
+Consumer to accumulator
+- c : identifying message
+- a ID CATEGORY : for a feature vector
 ===================================================
 Producer to Master
 - p : serves as identifying message
@@ -43,8 +46,9 @@ Producer to Consumer
 - p ID [featureVector] : feature vector to be processed
 
 ====================================================
-Consumer to accumulator
-- a ID CATEGORY
+accumulator to consumer
+- y : yes accepted connection
+- g : rejected connection
 
 accumulator to master
 - a PORT: identifying message
@@ -52,3 +56,14 @@ accumulator to master
 
 accumulator to accumulator
 - b [IP~PORT ...] : updated backup accumulators list each backup formatted as IP~PORT
+- s PORT : request to be added as a backup with server socket port PORT
+- h IP~PORT : current lead accumulator to connect to
+- o IP~PORT : leader for accumulator
+
+
+tentative handling disconnections
+if... master disconnects, accumulator keeps a copy of results on it
+when master sends queried result to client, then master sends to accumulator a done
+
+if... accumulator disconnects, backup replaces it, master sends it all the non-verified IDs
+consumers resend their information

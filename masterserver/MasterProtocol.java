@@ -50,7 +50,7 @@ public class MasterProtocol extends Protocol {
   Boolean isLeader;
   Boolean connected;
   String currentLeaderInfo;
-  String leadIP;
+  String leadIp;
   Integer leadPort;
   
   //accumulator information IP~Port
@@ -61,12 +61,9 @@ public class MasterProtocol extends Protocol {
   String connectionData;
   String incomingString;
   String [] messagePieces;
-  String [] acceptorMessagePieces;
-  String [] disMessagePieces;
-  String [] slistMessagePieces;
 
   public MasterProtocol(int serverPort,
-                        String leadIP, 
+                        String leadIp, 
                         int leadPort,
                         int maxConsumers,
                         int numK,
@@ -84,9 +81,9 @@ public class MasterProtocol extends Protocol {
     serverList = new Vector<> ();
     this.serverPort = serverPort;
     connected = false;
-    this.leadIP = leadIP;
-    if (leadIP.equals("localhost") || leadIP.equals("::1"))
-      this.leadIP = "127.0.0.1";
+    this.leadIp = leadIp;
+    if (leadIp.equals("localhost") || leadIp.equals("::1"))
+      this.leadIp = "127.0.0.1";
     this.leadPort = leadPort;
     if (!new File(featureVectorsFile).exists()) {
       System.err.println("Not a valid filename");
@@ -202,14 +199,12 @@ public class MasterProtocol extends Protocol {
       System.out.println("Could not get identifying message!");
       return false;
     }
-    acceptorMessagePieces = incomingString.split(DELIM);
+    String [] acceptorMessagePieces = incomingString.split(DELIM);
     
     if (!isLeader) {
       //for cases when leader just disconnected; this next in line to be leader
       //let disconnection handling thread make this the leader then resume
-      if (acceptorMessagePieces[0].equals("s")) {
-        try { Thread.sleep(1000); } catch (InterruptedException e) {}
-      }
+      try { Thread.sleep(1000); } catch (InterruptedException e) {}
       if (!isLeader) {
         sendMessage(numConnections, "l " + currentLeaderInfo);
         return false;
@@ -227,7 +222,8 @@ public class MasterProtocol extends Protocol {
         }
         ++numConsumers;
         consumerStringChange = true;
-        connectionData = (cSocket.getInetAddress().getHostAddress().toString() 
+        connectionData = 
+                (cSocket.getInetAddress().getHostAddress().toString() 
                 + DELIM2 + acceptorMessagePieces[1]);
         consumerConnectionData.put(numConnections, connectionData);
         //send out backup string k and numK
@@ -267,6 +263,7 @@ public class MasterProtocol extends Protocol {
           Set<Integer> notifyList = consumerConnectionData.keySet();
           sendToNotifyList(notifyList, "a " + accumulatorInfo);
         }
+        sendMessage(numConnections, backupString);
         break;
       case 's':
         connectionData = (cSocket.getInetAddress().getHostAddress().toString() 
@@ -288,7 +285,7 @@ public class MasterProtocol extends Protocol {
   }
   
   void handleLeaderDisconnection() {
-    disMessagePieces= backupString.split(DELIM, 3);
+    String [] disMessagePieces= backupString.split(DELIM, 3);
 
     //wait until new backupString is updated since it might take time
     while (disMessagePieces.length < 2)
@@ -305,15 +302,15 @@ public class MasterProtocol extends Protocol {
         if (isMyIpPort(nextLeader[0], nextLeader[1])) {
           System.out.println("I'm the leader!");
           isLeader = true;
-          slistMessagePieces = backupString.split(DELIM);
+          String [] slistMessagePieces = backupString.split(DELIM);
           serverList.clear();
           for (int i = 1; i != slistMessagePieces.length; ++i) {
             serverList.add(slistMessagePieces[i]);
           }
           resolved = true;
         } else {
-           connectToLeader(nextLeader[0], nextLeader[1]);
-           resolved = true;
+          connectToLeader(nextLeader[0], nextLeader[1]);
+          resolved = true;
         }
       } catch (UnknownHostException e) {
         System.err.println("Resolution bug!");
@@ -341,7 +338,7 @@ public class MasterProtocol extends Protocol {
     sendToNotifyList(notifyList, backupString);
     //send to accumulator too
     if (accumulatorId != defaultAccumulatorId) {
-      sendMessage(defaultAccumulatorId, "m" + backupString.substring(1));
+      sendMessage(accumulatorId, "m" + backupString.substring(1));
     }
   }
   
@@ -384,13 +381,13 @@ public class MasterProtocol extends Protocol {
   @Override
   public void connect() {
     try {
-      isLeader = isMyIpPort(leadIP, leadPort.toString());  
+      isLeader = isMyIpPort(leadIp, leadPort.toString());  
     } catch (UnknownHostException e) {
       System.err.println("Could not identify leader!");
       System.exit(1);
     }
     if (!isLeader) {
-      connectToLeader(leadIP, leadPort.toString());
+      connectToLeader(leadIp, leadPort.toString());
     }
   }
 }
