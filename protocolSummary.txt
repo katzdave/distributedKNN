@@ -24,13 +24,11 @@ Master to Master
 - l IP~PORT : current leader formatted as IP~PORT, need to connect to leader
 - b [IP~PORT ...] : updated backup masters list each backup formatted as IP~PORT
 
-Master to Self
-- r : request to pair producer with consumers
-
 Master to Aggregator:
 - n : already connected to aggregator
+- l IP~PORT : current leader formatted as IP~PORT, need to connect to leader
 - m [IP~PORT ...] : backup string for masters
-- t NUMVECTORS K(for top k) : tells aggregator how many vectors it needs
+- t MAXCONSUMERS K(for top k) : tells aggregator how many consumers and k
 ==================================================
 Consumer to Master
 - c PORT : identifying message to master upon connection to master serversocket
@@ -53,5 +51,4 @@ Aggregator to master
 - d ID CATEGORY : done with aggregating: here's the given id's category
 
 Aggregator to Aggregator
-- l IP~PORT : current leader formatted as IP~PORT, need to connect to leader
 - b [IP~PORT ...] : updated backup aggregators list each backup formatted as IP~PORT

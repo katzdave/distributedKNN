@@ -283,6 +283,12 @@ public class MasterProtocol extends Protocol {
           return false;
         }
         aggregatorID = numConnections;
+        try {
+          outgoingMessages.put(new Message(numConnections, 
+                  "t " + maxConsumers + " " + numK));
+        } catch (InterruptedException ex) {
+          System.err.println("interrupted adding message to queue");
+        }
         aggregatorInfo = (cSocket.getInetAddress().getHostAddress().toString() 
                 + "~" + acceptorMessagePieces[1]);
         //when disconnections occur for aggregator
