@@ -8,13 +8,12 @@ package accumulator;
 
 import connectionManager.*;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import knn.*;
@@ -26,36 +25,41 @@ import knn.*;
 public class AccumulatorProtocol extends Protocol{
   static String DELIM = " ";
   static String DELIM2 = "~";
+  int masterId = -1;
   
-  String MasterIP;
-  int MasterPort;
-  int MyPort;
-  int NumConsumers;
+  String masterIp;
+  int masterPort;
+  int myServerPort;
+  int numConsumers;
   int K;
   
-  HashMap<Integer, CategoryFinder> CategoryFinders;
+  HashMap<Integer, CategoryFinder> categoryFinders;
   ExecutorService pool;
   
-   /**
-   * 
-   * @param numConnections
-   * the ID number assigned to the computer that recently connected
-   * numConnections is the key for the sockets ConcurrentMap
-   * @param incomingStream
-   * Input stream for socket, can be used to get an identifying message
-   * @param cSocket
-   * socket can be used to get useful information such as IP address
-   * @return 
-   * returns true if the connection should be established
-   * false otherwise
+  /**
+   * @param masterIp
+   * @param masterPort
+   * @param myPort
+   * @param cores
    */
+  public AccumulatorProtocol(String masterIp,
+                             int masterPort,
+                             int myServerPort,
+                             int cores) {
+    this.masterIp = masterIp;
+    this.masterPort = masterPort;
+    this.myServerPort = myServerPort;
+    categoryFinders = new HashMap<>();
+    pool = Executors.newFixedThreadPool(cores);
+  }
+  
   @Override
   public boolean processAcceptorMessages(int numConnections, 
-                                  BufferedReader incomingStream, 
-                                  Socket cSocket) {
-    throw new UnsupportedOperationException("Not supported yet.");
+                                         BufferedReader incomingStream, 
+                                         Socket cSocket) {
+    return true;
   }
-
+  
   /**
    * Takes a Message object and processes the encapsulated message
    * @param message 
@@ -68,11 +72,11 @@ public class AccumulatorProtocol extends Protocol{
     String[] strings = message.message.split(DELIM);
     if(strings[0].equals("a")){
       Integer id = new Integer(Integer.parseInt(strings[1]));
-      if(!CategoryFinders.containsKey(id)){
-        CategoryFinders.put(id, new CategoryFinder(id, NumConsumers, K));
+      if(!categoryFinders.containsKey(id)){
+        categoryFinders.put(id, new CategoryFinder(id, numConsumers, K));
       }
       pool.submit(new CategoryFinderWorker(
-              strings[2], CategoryFinders.get(id),outgoingMessages));
+              strings[2], categoryFinders.get(id),outgoingMessages));
     }
   }
 
@@ -93,18 +97,19 @@ public class AccumulatorProtocol extends Protocol{
     System.out.println("Attempting to connect to master");
     Socket masterSocket;
     try {
-      masterSocket = new Socket(MasterIP, MasterPort);
+      masterSocket = new Socket(masterIp, masterPort);
       BufferedReader masterStream = new BufferedReader(
               new InputStreamReader(masterSocket.getInputStream()));
-      PrintWriter pr = new PrintWriter(masterSocket.getOutputStream());
-      pr.println("a " + MyPort);
+      DataOutputStream out = 
+              new DataOutputStream(masterSocket.getOutputStream());
+      out.writeBytes("a " + myServerPort + "\n");
       String s = masterStream.readLine();
       String [] strings = s.split(DELIM);
-      NumConsumers = Integer.parseInt(strings[1]);
+      numConsumers = Integer.parseInt(strings[1]);
       K = Integer.parseInt(strings[2]);
       
-      sockets.put(-1, masterSocket);
-      Connection connection= new Connection(-1,
+      sockets.put(masterId, masterSocket);
+      Connection connection= new Connection(masterId,
                                             isrunning,
                                             incomingMessages,
                                             masterStream,
@@ -116,19 +121,4 @@ public class AccumulatorProtocol extends Protocol{
     }
   }
   
-  /**
-   * Functionality to initialize other classes encapsulated within protocol
-   * Protocol will already have access to running, sockets, incomingMessages, and outgoingMessages
-   * @param masterIp
-   * @param masterPort
-   * @param myPort
-   * @param cores
-   */
-  public void initialize(String masterIp, int masterPort, int myPort, int cores) {
-    MasterIP = masterIp;
-    MasterPort = masterPort;
-    MyPort = myPort;
-    CategoryFinders = new HashMap<>();
-    pool = Executors.newFixedThreadPool(cores);
-  }
 }

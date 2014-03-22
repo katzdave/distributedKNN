@@ -3,7 +3,9 @@ package connectionManager;
 import java.io.BufferedReader;
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  *
@@ -15,6 +17,14 @@ public abstract class Protocol {
   public ConcurrentMap<Integer, Socket> sockets;
   public BlockingQueue<Message> incomingMessages;
   public BlockingQueue<Message> outgoingMessages;
+  
+  //must call super(); in derived class! or else it will not work
+  public Protocol() {
+    isrunning = true;
+    sockets = new ConcurrentHashMap<>();
+    incomingMessages = new LinkedBlockingQueue<>();
+    outgoingMessages = new LinkedBlockingQueue<>();
+  }
   
   /**
    * 
@@ -28,6 +38,7 @@ public abstract class Protocol {
    * @return 
    * returns true if the connection should be established
    * false otherwise
+   * by default return true
    */
   public boolean processAcceptorMessages(int numConnections, 
                                   BufferedReader incomingStream, 
@@ -55,38 +66,11 @@ public abstract class Protocol {
   }
 
   /**
-   * should not be overridden
-   * passes references of important members to protocol
-   * so the protocol will have access to sending and receiving messages
-   * @param running
-   * @param sockets
-   * @param incomingMessages
-   * @param outgoingMessages 
-   */
-  void addMembers(Boolean running, 
-                  ConcurrentMap<Integer, Socket> sockets, 
-                  BlockingQueue<Message> incomingMessages, 
-                  BlockingQueue<Message> outgoingMessages) {
-    this.isrunning = running;
-    this.sockets = sockets;
-    this.incomingMessages = incomingMessages;
-    this.outgoingMessages = outgoingMessages;
-  }
-
-  /**
    * Functionality for connecting to a network
    * By default does nothing
    */
   public void connect() {
-    
-  }
-  
-  /**
-   * Functionality to initialize other classes encapsulated within protocol
-   * Protocol will already have access to running, sockets, incomingMessages, and outgoingMessages
-   */
-  public void initialize() {
-
+    throw new UnsupportedOperationException("Not supported yet.");
   }
   
 }

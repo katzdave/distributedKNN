@@ -7,7 +7,6 @@
 package accumulator;
 
 import connectionManager.Message;
-import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import knn.CategoryFinder;
 

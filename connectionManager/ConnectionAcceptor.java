@@ -54,11 +54,11 @@ public class ConnectionAcceptor extends Thread {
           System.err.println("Problem getting istream from connection");
         }
         sockets.put(numConnections, cSocket);
-
-        if (protocol.processAcceptorMessages(numConnections, 
+        
+        //if it returns false, reject connection
+        if (!protocol.processAcceptorMessages(numConnections, 
                                              incomingStream, 
-                                             cSocket)
-            != true)
+                                             cSocket))
           continue;
 
         Connection connection;

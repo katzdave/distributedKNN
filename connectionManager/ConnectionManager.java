@@ -15,9 +15,7 @@ package connectionManager;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author Harrison
@@ -42,15 +40,11 @@ public class ConnectionManager {
    */
   public ConnectionManager(int serverPort, Protocol protocol) 
           throws IOException, InterruptedException {
-    isrunning = true;
-    sockets = new ConcurrentHashMap<>();
-    incomingMessages = new LinkedBlockingQueue<>();
-    outgoingMessages = new LinkedBlockingQueue<>();
     this.protocol = protocol;
-    protocol.addMembers(isrunning, 
-                        sockets, 
-                        incomingMessages, 
-                        outgoingMessages);
+    isrunning = protocol.isrunning;
+    sockets = protocol.sockets;
+    incomingMessages = protocol.incomingMessages;
+    outgoingMessages = protocol.outgoingMessages;
     scAcceptor = new ConnectionAcceptor(serverPort,
                                         isrunning, 
                                         sockets,
@@ -59,7 +53,6 @@ public class ConnectionManager {
     sMessenger = new ConnectionMessenger(isrunning,
                                          sockets,
                                          outgoingMessages);
-    protocol.initialize();
   }
   
   /**

@@ -20,7 +20,12 @@ import java.util.Collection;
 
 public class MasterProtocol extends Protocol {
   
+  String DELIM = " ";
+  String DELIM2 = "~";
+  int leaderId = -1;
+  int defaultAccumulatorId = -2;
   //Note: for sockets ConcurrentMap: -1 spot reserved for leader
+  //      -2 spot default for accumulator if none is connected
   
   //contains the IP address and port number of the consumer
   //stores it as ipAddress~portNumberOfServerSocket
@@ -49,7 +54,7 @@ public class MasterProtocol extends Protocol {
   Integer leadPort;
   
   //accumulator information IP~Port
-  Integer accumulatorID;
+  Integer accumulatorId;
   String accumulatorInfo;
   
   //split strings
@@ -67,7 +72,8 @@ public class MasterProtocol extends Protocol {
                         int numK,
                         String featureVectorsFile) 
           throws IOException, InterruptedException {
-    accumulatorID = -2;
+    super();
+    accumulatorId = defaultAccumulatorId;
     startedKNN = false;
     consumerStringChange = true;
     this.numK = numK;
@@ -87,16 +93,20 @@ public class MasterProtocol extends Protocol {
       System.exit(1);
     }
     this.featureVectorsFile = featureVectorsFile;
+    knn = new MasterKnnWrapper(consumerConnectionData, outgoingMessages);
   }
   
-  @Override
-  public void initialize() {
-    knn = new MasterKnnWrapper(consumerConnectionData, outgoingMessages);
+  public void sendMessage(int id, String message) {
+    try {
+      outgoingMessages.put(new Message(id, message));
+    } catch (InterruptedException e) {
+      System.out.println("Interrupted sending message to"+id+DELIM+message);
+    }
   }
   
   @Override
   public void processManagerMessages(Message incomingMessage) {
-    messagePieces = incomingMessage.message.split(" ");
+    messagePieces = incomingMessage.message.split(DELIM);
     System.out.println("Processing message from " 
             + incomingMessage.connectedID + ": " + incomingMessage.message);
     switch(messagePieces[0].charAt(0)) {
@@ -106,18 +116,14 @@ public class MasterProtocol extends Protocol {
                 messagePieces[1]);
         break;
       case 'q':
-        System.out.println("Received query request for id: " + messagePieces[1]);
+        System.out.println("Received query request for id: "+ messagePieces[1]);
         queryResult = knn.GetTestResult(Integer.parseInt(messagePieces[1]));
-        try {
-          if (queryResult == null) {
-            outgoingMessages.put(new Message(incomingMessage.connectedID, "c"));
-          } else {
-           outgoingMessages.put(new Message(incomingMessage.connectedID,
-                    "q " + messagePieces[1] + " " + queryResult));
-         }          
-        } catch (InterruptedException e) {
-          System.out.println("Interrupted Query request");
-        }
+        if (queryResult == null) {
+          sendMessage(incomingMessage.connectedID, "c");
+        } else {
+          sendMessage(incomingMessage.connectedID, 
+                      "q " + messagePieces[1] + DELIM + queryResult);
+        }          
         break;
       case 'b':
         connected = true;
@@ -125,12 +131,12 @@ public class MasterProtocol extends Protocol {
         System.out.println("Received updated backupString: " + backupString);
         break;
       case 'l':
-        if (sockets.containsKey(-1)) {
+        if (sockets.containsKey(leaderId)) {
           try {
-            sockets.get(-1).close();
+            sockets.get(leaderId).close();
           } catch (IOException e) {}
         }
-        messagePieces = messagePieces[1].split("~");
+        messagePieces = messagePieces[1].split(DELIM2);
         connectToLeader(messagePieces[0], messagePieces[1]);
         break;
       case 'd':
@@ -145,37 +151,32 @@ public class MasterProtocol extends Protocol {
   
   //handles pairing request from client
   void handlePairClientWithConsumer (int connectedID, String featureVector) {
-    try {
-      if (numConsumers == maxConsumers) {
-        while (consumerStringChange) {
-          consumerString = "";
-          Collection<String> consumers = consumerConnectionData.values();
-          for (String consumer : consumers) {
-            consumerString += (" " + consumer);
-          }
-          consumerStringChange = false;
+    if (numConsumers == maxConsumers) {
+      while (consumerStringChange) {
+        consumerString = "";
+        Collection<String> consumers = consumerConnectionData.values();
+        for (String consumer : consumers) {
+          consumerString += (DELIM + consumer);
         }
-        outgoingMessages.put(new Message(connectedID,
-                "y " + knn.AddTestVector(featureVector) + consumerString));
-      } else {
-        outgoingMessages.put(new Message(connectedID, "n"));
+        consumerStringChange = false;
       }
-    } catch (InterruptedException e) {
-      System.out.println("Interrupted Query request");
+      sendMessage(connectedID,
+                  "y " + knn.AddTestVector(featureVector) + consumerString);
+    } else {
+      sendMessage(connectedID, "n");
     }
-      
   }
   
   //handled across multiple threads, utilizing Connection class
   @Override
   public void handleDisconnection(int connectedID) {
     sockets.remove(connectedID);
-    if (!connected && connectedID == -1)
+    if (!connected && connectedID == leaderId)
       return;
-    if (connectedID == -1) {
+    if (connectedID == leaderId) {
       handleLeaderDisconnection();
-    } else if (connectedID == accumulatorID) {
-      accumulatorID = -2;
+    } else if (connectedID == accumulatorId) {
+      accumulatorId = defaultAccumulatorId;
       System.out.println("The accumulator disconnected!");
     } else if (consumerConnectionData.containsKey(connectedID)) {
       --numConsumers;
@@ -195,72 +196,49 @@ public class MasterProtocol extends Protocol {
                                          BufferedReader incomingStream, 
                                          Socket cSocket) {
     
-    try {
-      incomingString = incomingStream.readLine();
-    } catch (IOException e) {}
+    try { incomingString = incomingStream.readLine(); } catch (IOException e) {}
+    
     if (incomingString == null) {
       System.out.println("Could not get identifying message!");
       return false;
     }
+    acceptorMessagePieces = incomingString.split(DELIM);
     
-    acceptorMessagePieces = incomingString.split(" ");
     if (!isLeader) {
       //for cases when leader just disconnected; this next in line to be leader
       //let disconnection handling thread make this the leader then resume
       if (acceptorMessagePieces[0].equals("s")) {
-        try {
-          Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
+        try { Thread.sleep(1000); } catch (InterruptedException e) {}
       }
       if (!isLeader) {
-        try {
-          outgoingMessages.put(new Message(numConnections, 
-                 "l " + currentLeaderInfo));
-        } catch (InterruptedException ex) {}
+        sendMessage(numConnections, "l " + currentLeaderInfo);
         return false;
       }
     }
     
     switch(acceptorMessagePieces[0].charAt(0)) {
       case 'p':
-        try {
-          outgoingMessages.put(new Message(numConnections, backupString));
-        } catch (InterruptedException ex) {
-          System.err.println("interrupted adding message to queue");
-        }
+        sendMessage(numConnections, backupString);
         break;
       case 'c':
         if (numConsumers == maxConsumers) {
-          try {
-            outgoingMessages.put(new Message(numConnections, "n"));
-          } catch (InterruptedException ex) {
-            System.err.println("interrupted adding message to queue");
-          }
+          sendMessage(numConnections, "n");
           return false;
         }
         ++numConsumers;
         consumerStringChange = true;
         connectionData = (cSocket.getInetAddress().getHostAddress().toString() 
-                + "~" + acceptorMessagePieces[1]);
+                + DELIM2 + acceptorMessagePieces[1]);
         consumerConnectionData.put(numConnections, connectionData);
-        try {
-          //send out backup string k and numK
-          outgoingMessages.put(new Message(numConnections, backupString));
-          outgoingMessages.put(new Message(numConnections, "k " + numK));
-          //if numConsumers  == maxConsumers
-        } catch (InterruptedException ex) {
-          System.err.println("interrupted adding message to queue");
-        }
+        //send out backup string k and numK
+        sendMessage(numConnections, backupString);
+        sendMessage(numConnections, "k " + numK);
+
         //when disconnections occur for consumers or initialization
         if (numConsumers == maxConsumers) {
           Set<Integer> notifyList = consumerConnectionData.keySet();
-          if (accumulatorID == -2) {
-            try {
-              outgoingMessages.put(new Message(numConnections, "n"));
-            } catch (InterruptedException ex) {
-              System.err.println("interrupted adding message to queue");
-            }
+          if (accumulatorId == defaultAccumulatorId) {
+            sendMessage(numConnections, "n");
             return false;
           }
           sendToNotifyList(notifyList, "a " + accumulatorInfo);
@@ -274,23 +252,16 @@ public class MasterProtocol extends Protocol {
         break;
       case 'a':
         //if ID == -2, not yet connected to accumulator
-        if (accumulatorID != -2) {
-          try {
-            outgoingMessages.put(new Message(numConnections, "n"));
-          } catch (InterruptedException ex) {
-            System.err.println("interrupted adding message to queue");
-          }
+        if (accumulatorId != defaultAccumulatorId) {
+          sendMessage(numConnections, "n");
           return false;
         }
-        accumulatorID = numConnections;
-        try {
-          outgoingMessages.put(new Message(numConnections, 
-                  "t " + maxConsumers + " " + numK));
-        } catch (InterruptedException ex) {
-          System.err.println("interrupted adding message to queue");
-        }
+        
+        accumulatorId = numConnections;
+        sendMessage(numConnections, "t " + maxConsumers + DELIM + numK);
         accumulatorInfo = (cSocket.getInetAddress().getHostAddress().toString() 
-                + "~" + acceptorMessagePieces[1]);
+                + DELIM2 + acceptorMessagePieces[1]);
+        
         //when disconnections occur for accumulator
         if (numConsumers == maxConsumers) {
           Set<Integer> notifyList = consumerConnectionData.keySet();
@@ -299,11 +270,11 @@ public class MasterProtocol extends Protocol {
         break;
       case 's':
         connectionData = (cSocket.getInetAddress().getHostAddress().toString() 
-                + "~" + acceptorMessagePieces[1]);
-        acceptorMessagePieces = backupString.split(" ");
+                + DELIM2 + acceptorMessagePieces[1]);
+        acceptorMessagePieces = backupString.split(DELIM);
         backupsConnectionData.put(numConnections, connectionData);
         if (!serverList.contains(connectionData)) {
-          backupString += (" " +connectionData);
+          backupString += (DELIM +connectionData);
           serverList.add(connectionData);
         }
         sendToAllUpdate();
@@ -317,13 +288,13 @@ public class MasterProtocol extends Protocol {
   }
   
   void handleLeaderDisconnection() {
-    disMessagePieces= backupString.split(" ", 3);
+    disMessagePieces= backupString.split(DELIM, 3);
 
     //wait until new backupString is updated since it might take time
     while (disMessagePieces.length < 2)
-      disMessagePieces= backupString.split(" ", 3);
+      disMessagePieces= backupString.split(DELIM, 3);
     currentLeaderInfo = disMessagePieces[1];
-    String[] nextLeader = currentLeaderInfo.split("~");
+    String[] nextLeader = currentLeaderInfo.split(DELIM2);
     if (disMessagePieces.length == 3)
       backupString = "b " + disMessagePieces[2];
     else if (disMessagePieces.length == 2)
@@ -334,7 +305,7 @@ public class MasterProtocol extends Protocol {
         if (isMyIpPort(nextLeader[0], nextLeader[1])) {
           System.out.println("I'm the leader!");
           isLeader = true;
-          slistMessagePieces = backupString.split(" ");
+          slistMessagePieces = backupString.split(DELIM);
           serverList.clear();
           for (int i = 1; i != slistMessagePieces.length; ++i) {
             serverList.add(slistMessagePieces[i]);
@@ -356,7 +327,7 @@ public class MasterProtocol extends Protocol {
     sockets.remove(connectedID);
     backupString = "b";
     for (int i = 0; i != serverList.size(); ++i) {
-      backupString += (" " + serverList.get(i));
+      backupString += (DELIM + serverList.get(i));
     }
     sendToAllUpdate();
   }
@@ -369,22 +340,14 @@ public class MasterProtocol extends Protocol {
     notifyList = consumerConnectionData.keySet();
     sendToNotifyList(notifyList, backupString);
     //send to accumulator too
-    if (sockets.containsKey(-2)) {
-      try {
-        outgoingMessages.put(new Message(-2, "m" + backupString.substring(1)));
-      } catch (InterruptedException ex) {
-        System.err.println("Didn't send message!");
-      }
+    if (accumulatorId != defaultAccumulatorId) {
+      sendMessage(defaultAccumulatorId, "m" + backupString.substring(1));
     }
   }
   
   void sendToNotifyList(Set<Integer> notifyList, String message) {
     for (Integer i : notifyList) {
-      try {
-        outgoingMessages.put(new Message(i, message));
-      } catch (InterruptedException ex) {
-        System.err.println("Didn't send message!");
-      }
+        sendMessage(i, message);
     }
   }
  
@@ -397,24 +360,21 @@ public class MasterProtocol extends Protocol {
   
   void connectToLeader(String leaderIP, String leaderPort) {
     System.out.println("Attempting to connect to leader: " 
-            + leaderIP + " " + leaderPort);
+            + leaderIP + DELIM + leaderPort);
     Socket leaderSocket;
     try {
       leaderSocket = new Socket(leaderIP, Integer.parseInt(leaderPort));
-      currentLeaderInfo = (leaderIP + "~" + leaderPort);
-      sockets.put(-1, leaderSocket);
+      currentLeaderInfo = (leaderIP + DELIM2 + leaderPort);
+      sockets.put(leaderId, leaderSocket);
       BufferedReader masterStream = new BufferedReader(
               new InputStreamReader(leaderSocket.getInputStream()));
-      Connection connection= new Connection(-1,
+      Connection connection= new Connection(leaderId,
                                             isrunning,
                                             incomingMessages,
                                             masterStream,
                                             this);
       connection.start();
-      try {
-        outgoingMessages.put(new Message(-1, "s " + serverPort));
-      } catch (InterruptedException e) {
-      }
+      sendMessage(leaderId, "s " + serverPort);
     } catch (IOException ex) {
       System.err.println("Couldn't connect to leader!");
       System.exit(1);
