@@ -18,7 +18,7 @@ public class FeatureVector{
   static String Delim = ",";
   
   Feature[] Features;
-  String Category;
+  public String Category;
   
   public FeatureVector(){
     Features = new Feature[NumFeatures];

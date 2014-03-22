@@ -4,16 +4,19 @@ Producer = Client
 
 =================================================
 Master to Consumer
-- a IP~PORT : aggregator IP and Port so consumers know
+- a IP~PORT : aggregator IP and Port so consumers know where to pass messages 
 - k NUMK : k for KNN algorithm
 - l IP~PORT : current leader formatted as IP~PORT, need to connect to leader
 - b [IP~PORT ...] : updated backup masters list each backup formatted as IP~PORT
+- m [featureVector]: sends a training feature vector with its ID to consumer
 
 Master to Producer
 - y ID [IP~PORT ...] : request can be received assigned ID, consumers' IP~PORT as a list delimited by spaces
 - n : busy at the moment, check back later (if not enough consumers connected to master)
 - l IP~PORT : current leader formatted as IP~PORT, need to connect to leader
 - b [IP~PORT ...] : updated backup masters list each backup formatted as IP~PORT
+- q ID CATEGORY : category of query 
+- c : could not get query
 
 Master to Master
 - s PORT : request to be added as a backup with server socket port PORT
@@ -24,6 +27,7 @@ Master to Self
 - r : request to pair producer with consumers
 
 Master to Aggregator:
+- m [IP~PORT ...] : backup string for masters
 - t NUMVECTORS K(for top k) : tells aggregator how many vectors it needs
 ==================================================
 Consumer to Master
@@ -43,5 +47,9 @@ Consumer to Aggregator
 - a ID CATEGORY
 
 Aggregator to master
-- a : identifying message
+- a PORT: identifying message
 - d ID CATEGORY : done with aggregating: here's the given id's category
+
+Aggregator to Aggregator
+- l IP~PORT : current leader formatted as IP~PORT, need to connect to leader
+- b [IP~PORT ...] : updated backup aggregators list each backup formatted as IP~PORT

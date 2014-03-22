@@ -4,8 +4,9 @@
  * and open the template in the editor.
  */
 
-package knn;
+package masterserver;
 
+import connectionManager.Message;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,44 +14,80 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentMap;
+import knn.FeatureVector;
+import knn.FeatureVectorLoader;
+
 
 /**
  * What the master uses to store all of the features indexed by ConsumerId
  * @author david
  */
-public class MasterFeatureContainer {
+public class MasterKnnWrapper {
   HashMap<Integer, List<FeatureVector>> TrainingData = new HashMap<>();
   HashMap<Integer, FeatureVector> TestData = new HashMap<>();
   HashMap<Integer, String> TestResult = new HashMap<>();
+  ConcurrentMap<Integer, String> consumerConnectionData;
+  BlockingQueue<Message> outgoingMessages;
   
-  int NumConsumers = 0; // Increment this each time a consumer connects?
-  int LastTestId = 0; // Increment this before every test
+  int LastTestId; // Increment this before every test
+  
+  public MasterKnnWrapper(ConcurrentMap<Integer, String> consumerConnectionData,
+                          BlockingQueue<Message> outgoingMessages) {
+    TrainingData = new HashMap<>();
+    TestData = new HashMap<>();
+    TestResult = new HashMap<>();
+    this.outgoingMessages = outgoingMessages;
+    this.consumerConnectionData = consumerConnectionData;
+    LastTestId = 0;
+  }
   
   public void LoadAndDistributeTrainingDataEqually(String filename){
     FeatureVectorLoader fvl = new FeatureVectorLoader();
     List<FeatureVector> allTraining = fvl.FeatureVectorsFromTextFile(filename);
-    int amt = allTraining.size()/NumConsumers;
-    int rem = allTraining.size()%NumConsumers;
+    Integer [] consumerIds = consumerConnectionData.keySet()
+            .toArray(new Integer[0]);
+    Integer numConsumers = consumerIds.length;
+    int amt = allTraining.size()/numConsumers;
+    int rem = allTraining.size()%numConsumers;
     int last = 0;
     int curr;
     
-    for(int i=0; i<NumConsumers; i++){
+    for(int i=0; i<numConsumers; i++){
       curr = last + amt;
       if(rem > 0){
         curr++;
         rem--;
       }
-      TrainingData.put(new Integer(i), allTraining.subList(last, curr));
+      TrainingData.put(consumerIds[i], allTraining.subList(last, curr));
       curr = last;
+    }
+    
+    List<FeatureVector> vectors;
+    for(int i=0; i<numConsumers; i++){
+      vectors = TrainingData.get(consumerIds[i]);
+      for (FeatureVector current : vectors) {
+        try {
+          outgoingMessages.put(new Message(consumerIds[i], current.toString()));
+        } catch (InterruptedException ex) {
+          System.err.println("Interrupted sending of feature vectors");
+        }
+      }
     }
   }
   
-  public void AddTestVector(FeatureVector fv){
-    LastTestId++;
+  public int AddTestVector(String featureVector){
+    FeatureVector fv = new FeatureVector(featureVector);
     TestData.put(new Integer(LastTestId), fv);
     TestResult.put(new Integer(LastTestId), null);
+    return LastTestId++;
   }
   
+  public void AddTestedCategory(int featureVectorId, String category) {
+    TestResult.put(featureVectorId, category);
+  }
+          
   //NOTE: Will return null if test incomplete or invalid
   //Not sure if these cases being indistinguishable is a problem
   public String GetTestResult(int id){

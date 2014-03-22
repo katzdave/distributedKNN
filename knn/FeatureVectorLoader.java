@@ -22,7 +22,7 @@ import javax.imageio.ImageIO;
 public class FeatureVectorLoader {
   static String DELIM = " ";
   
-  List<FeatureVector> FeatureVectorsFromTextFile(String filename){
+  public List<FeatureVector> FeatureVectorsFromTextFile(String filename){
     List<FeatureVector> vectors = new ArrayList<>();
     try {
       String sCurrentLine;
