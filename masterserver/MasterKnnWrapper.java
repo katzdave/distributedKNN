@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import knn.FeatureVector;
 import knn.FeatureVectorLoader;
 
@@ -28,6 +29,7 @@ public class MasterKnnWrapper {
   HashMap<Integer, List<FeatureVector>> TrainingData = new HashMap<>();
   HashMap<Integer, FeatureVector> TestData = new HashMap<>();
   HashMap<Integer, String> TestResult = new HashMap<>();
+  BlockingQueue<Integer> disconnectedList;
   ConcurrentMap<Integer, String> consumerConnectionData;
   BlockingQueue<Message> outgoingMessages;
   
@@ -40,6 +42,7 @@ public class MasterKnnWrapper {
     TestResult = new HashMap<>();
     this.outgoingMessages = outgoingMessages;
     this.consumerConnectionData = consumerConnectionData;
+    disconnectedList = new LinkedBlockingQueue<>();
     LastTestId = 0;
   }
   
@@ -75,6 +78,35 @@ public class MasterKnnWrapper {
         }
       }
     }
+  }
+  
+  public void markAsDropped(int id) {
+    disconnectedList.add(id);
+  }
+  
+  public boolean reassignDropped() {
+    Integer [] consumerIds = consumerConnectionData.keySet()
+            .toArray(new Integer[0]);
+    Integer currentId;
+    List<FeatureVector> currentList;
+    for (int i = 0; i != consumerIds.length; ++i) {
+      if (!TrainingData.containsKey(consumerIds[i])) {
+        if (disconnectedList.isEmpty()) {
+          return false;
+        } else {
+          try {
+            currentId = disconnectedList.take();
+            currentList = TrainingData.get(currentId);
+            TrainingData.put(consumerIds[i], currentList);
+            TrainingData.remove(currentId);
+            for (FeatureVector v : currentList)
+              outgoingMessages.put(new Message(consumerIds[i], v.toString()));
+          } catch (InterruptedException e) {
+          }
+        }
+      }
+    }
+    return true;
   }
   
   public int AddTestVector(String featureVector){
