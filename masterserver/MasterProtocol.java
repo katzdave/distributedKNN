@@ -48,9 +48,9 @@ public class MasterProtocol extends Protocol {
   String leadIP;
   Integer leadPort;
   
-  //aggregator information IP~Port
-  Integer aggregatorID;
-  String aggregatorInfo;
+  //accumulator information IP~Port
+  Integer accumulatorID;
+  String accumulatorInfo;
   
   //split strings
   String connectionData;
@@ -67,7 +67,7 @@ public class MasterProtocol extends Protocol {
                         int numK,
                         String featureVectorsFile) 
           throws IOException, InterruptedException {
-    aggregatorID = -2;
+    accumulatorID = -2;
     startedKNN = false;
     consumerStringChange = true;
     this.numK = numK;
@@ -174,9 +174,9 @@ public class MasterProtocol extends Protocol {
       return;
     if (connectedID == -1) {
       handleLeaderDisconnection();
-    } else if (connectedID == aggregatorID) {
-      aggregatorID = -2;
-      System.out.println("The aggregator disconnected!");
+    } else if (connectedID == accumulatorID) {
+      accumulatorID = -2;
+      System.out.println("The accumulator disconnected!");
     } else if (consumerConnectionData.containsKey(connectedID)) {
       --numConsumers;
       consumerStringChange = true;
@@ -255,7 +255,7 @@ public class MasterProtocol extends Protocol {
         //when disconnections occur for consumers or initialization
         if (numConsumers == maxConsumers) {
           Set<Integer> notifyList = consumerConnectionData.keySet();
-          if (aggregatorID == -2) {
+          if (accumulatorID == -2) {
             try {
               outgoingMessages.put(new Message(numConnections, "n"));
             } catch (InterruptedException ex) {
@@ -263,7 +263,7 @@ public class MasterProtocol extends Protocol {
             }
             return false;
           }
-          sendToNotifyList(notifyList, "a " + aggregatorInfo);
+          sendToNotifyList(notifyList, "a " + accumulatorInfo);
           if (!startedKNN) {
             startedKNN = true;
             knn.LoadAndDistributeTrainingDataEqually(featureVectorsFile);
@@ -273,8 +273,8 @@ public class MasterProtocol extends Protocol {
         }
         break;
       case 'a':
-        //if ID == -2, not yet connected to aggregator
-        if (aggregatorID != -2) {
+        //if ID == -2, not yet connected to accumulator
+        if (accumulatorID != -2) {
           try {
             outgoingMessages.put(new Message(numConnections, "n"));
           } catch (InterruptedException ex) {
@@ -282,19 +282,19 @@ public class MasterProtocol extends Protocol {
           }
           return false;
         }
-        aggregatorID = numConnections;
+        accumulatorID = numConnections;
         try {
           outgoingMessages.put(new Message(numConnections, 
                   "t " + maxConsumers + " " + numK));
         } catch (InterruptedException ex) {
           System.err.println("interrupted adding message to queue");
         }
-        aggregatorInfo = (cSocket.getInetAddress().getHostAddress().toString() 
+        accumulatorInfo = (cSocket.getInetAddress().getHostAddress().toString() 
                 + "~" + acceptorMessagePieces[1]);
-        //when disconnections occur for aggregator
+        //when disconnections occur for accumulator
         if (numConsumers == maxConsumers) {
           Set<Integer> notifyList = consumerConnectionData.keySet();
-          sendToNotifyList(notifyList, "a " + aggregatorInfo);
+          sendToNotifyList(notifyList, "a " + accumulatorInfo);
         }
         break;
       case 's':
@@ -368,7 +368,7 @@ public class MasterProtocol extends Protocol {
     sendToNotifyList(notifyList, backupString);
     notifyList = consumerConnectionData.keySet();
     sendToNotifyList(notifyList, backupString);
-    //send to aggregator too
+    //send to accumulator too
     if (sockets.containsKey(-2)) {
       try {
         outgoingMessages.put(new Message(-2, "m" + backupString.substring(1)));
