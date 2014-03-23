@@ -35,6 +35,7 @@ Consumer to Master
 - c PORT : identifying message to master upon connection to master serversocket
 
 Consumer to accumulator
+- c : identification
 - a [ID CATEGORY ...] : for a feature vectors, batched for k
 ===================================================
 Producer to Master

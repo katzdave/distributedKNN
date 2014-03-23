@@ -1,5 +1,8 @@
 package accumulator;
 
+import connectionManager.ConnectionManager;
+import java.io.IOException;
+
 /**
  *
  * @author H
@@ -34,5 +37,15 @@ public class Accumulator {
                     args[3], 
                     masterPort, 
                     numCores);
+    ConnectionManager accumulator;
+    try {
+      accumulator = new ConnectionManager(myServerPort, 
+                                          protocol);
+      accumulator.runManager();
+    } catch (IOException ex) {
+      System.err.println("Could not start up server!");
+    } catch (InterruptedException ex) {
+      System.err.println("Could not start up server!");
+    }
   }
 }
