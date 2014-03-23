@@ -6,10 +6,47 @@
 
 package src.main.java.client;
 
+import connectionManager.Message;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import knn.FeatureVector;
+import knn.FeatureVectorLoader;
+
 /**
  *
  * @author David
  */
-public class ClientWorker {
+public class ClientWorker implements Runnable{
+
+  int id = -1;
+  BlockingQueue<Message> outgoingMessages;
+  String fileName;
+  Boolean fileTypeFlag;
   
+  public ClientWorker(BlockingQueue<Message> outgoing,
+          String filename, boolean flag){
+    fileName = filename;
+    fileTypeFlag = flag;
+    outgoingMessages = outgoing;
+  }
+  
+  @Override
+  public void run() {
+    if(fileTypeFlag){
+      FeatureVectorLoader fvl = new FeatureVectorLoader();
+      List<FeatureVector> features = fvl.FeatureVectorsFromTextFile(fileName);
+      for(FeatureVector feature : features){
+        sendMessage("r " + feature.toString());
+      }
+    }
+    
+  }
+  
+  void sendMessage(String message) {
+    try {
+      outgoingMessages.put(new Message(id, message));
+    } catch (InterruptedException e) {
+      System.out.println("Interrupted sending message cliennt worker");
+    }
+  }
 }
