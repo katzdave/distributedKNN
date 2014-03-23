@@ -41,6 +41,7 @@ public class ConsumerProtocol extends Protocol {
   }
   
   void sendMessage(int id, String message) {
+    System.out.println(id + DELIM + message);
     try {
       outgoingMessages.put(new Message(id, message));
     } catch (InterruptedException e) {
@@ -58,6 +59,7 @@ public class ConsumerProtocol extends Protocol {
   @Override
   public void processManagerMessages(Message message) {
     String[] msgPieces = message.message.split(DELIM);
+    //System.out.println("Got message" + message.message);
     switch (msgPieces[0].charAt(0)) {
       case 'b':
         backupMasterString = message.message;
@@ -79,6 +81,7 @@ public class ConsumerProtocol extends Protocol {
         break;
       case 't':
         //training vectors
+        System.out.println("got!");
         knn.addTrainingVectors(message.message);
         break;
       case 'n':
@@ -185,7 +188,7 @@ public class ConsumerProtocol extends Protocol {
                                             masterStream,
                                             this);
       connection.start();
-      sendMessage(masterId, "c");
+      sendMessage(accumulatorId, "c");
     } catch (IOException ex) {
       System.err.println("Couldn't connect to master!");
     }

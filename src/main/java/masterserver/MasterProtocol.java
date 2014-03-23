@@ -153,9 +153,12 @@ public class MasterProtocol extends Protocol {
           sendMessage(testDataToProducer.get(testedId), messagePieces[2]);   
         }
         break;
+      case 'c':
+        System.out.println("wtf");
+        break;
       default:
         System.err.println("Received invalid message from clientID: "
-                + incomingMessage.connectedID);
+                + incomingMessage.connectedID + DELIM + incomingMessage.message);
     }
   }
   
@@ -174,10 +177,11 @@ public class MasterProtocol extends Protocol {
         sendMessage(consumerId, 
                 "p"+DELIM+vectorId+DELIM+featureVector);
     } else {
-      try {
+      /*try {
         incomingMessages.put(new Message(connectedID, "r " + featureVector));
       } catch (InterruptedException e) {
-      }
+      }*/
+      System.out.println("not enough consumers!");
     }
   }
   
@@ -193,6 +197,7 @@ public class MasterProtocol extends Protocol {
       accumulatorId = defaultAccumulatorId;
       System.out.println("The accumulator disconnected!");
     } else if (consumerConnectionData.containsKey(connectedID)) {
+      System.out.println("A consumer disconnected");
       --numConsumers;
       consumerListChange = true;
       consumerConnectionData.remove(connectedID);
@@ -228,11 +233,14 @@ public class MasterProtocol extends Protocol {
       }
     }
     
+    System.out.println("Received: " + numConnections);
     switch(acceptorMessagePieces[0].charAt(0)) {
       case 'p':
+        System.out.println("producer connected");
         sendMessage(numConnections, backupString);
         break;
       case 'c':
+        System.out.println("GOT!");
         if (numConsumers == maxConsumers) {
           sendMessage(numConnections, "n");
           return false;

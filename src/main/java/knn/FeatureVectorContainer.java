@@ -41,6 +41,8 @@ public class FeatureVectorContainer {
   }
   
   public String GetKnnAsString(String featureVector){
+    System.err.println(featureVector);
+    System.err.println(trainingVectors.size());
     FeatureVector fv = new FeatureVector(featureVector);
     PriorityBlockingQueue<CategoryDistances> pbq = new PriorityBlockingQueue<>();
     ExecutorService pool = Executors.newFixedThreadPool(NumWorkers);
@@ -61,7 +63,6 @@ public class FeatureVectorContainer {
       }
       outp += cd.toString() + VectorDelim;
     }
-    
     return outp.substring(0, outp.length()-1);
   }
   
@@ -71,10 +72,9 @@ public class FeatureVectorContainer {
   
   public void addTrainingVectors(String featureVectorBatch){
     String [] tVectors = featureVectorBatch.split(DELIM);
-    FeatureVector fv;
-    for (int i = 1; i != tVectors.length; ++i) {
-      fv = new FeatureVector(tVectors[i]);
-      trainingVectors.add(fv);
+    System.err.println(tVectors.length);
+    for (int i = 1; i != tVectors.length; i++) {
+      trainingVectors.add(new FeatureVector(tVectors[i]));
     }
   }
 }
