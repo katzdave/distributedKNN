@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.io.File;
-import java.util.Collection;
+import java.util.HashMap;
 
 public class MasterProtocol extends Protocol {
   
@@ -32,6 +32,7 @@ public class MasterProtocol extends Protocol {
   final ConcurrentMap<Integer, String> consumerConnectionData;
   final ConcurrentMap<Integer, String> backupsConnectionData;
   MasterKnnWrapper knn;
+  HashMap<Integer, Integer> testDataToProducer;
   
   String featureVectorsFile;
   Integer numK;
@@ -91,6 +92,7 @@ public class MasterProtocol extends Protocol {
     }
     this.featureVectorsFile = featureVectorsFile;
     knn = new MasterKnnWrapper(consumerConnectionData, outgoingMessages);
+    testDataToProducer = new HashMap<>();
   }
   
   public void sendMessage(int id, String message) {
@@ -144,8 +146,12 @@ public class MasterProtocol extends Protocol {
         connectToLeader(messagePieces[0], messagePieces[1]);
         break;
       case 'd':
-        knn.AddTestedCategory(
-                Integer.parseInt(messagePieces[1]), messagePieces[2]);
+        int testedId = Integer.parseInt(messagePieces[1]);
+        knn.AddTestedCategory(testedId, messagePieces[2]);
+        if (testDataToProducer.containsKey(testedId)
+                && sockets.containsKey(testDataToProducer.get(testedId))) {
+          sendMessage(testDataToProducer.get(testedId), messagePieces[2]);   
+        }
         break;
       default:
         System.err.println("Received invalid message from clientID: "
@@ -162,6 +168,7 @@ public class MasterProtocol extends Protocol {
         consumerList = consumerConnectionData.keySet();
       }
       int vectorId = knn.AddTestVector(featureVector);
+      testDataToProducer.put(vectorId, connectedID);
       sendMessage(connectedID, "e"+DELIM+vectorId+DELIM+featureVector);
       for (int consumerId : consumerList)
         sendMessage(consumerId, 
