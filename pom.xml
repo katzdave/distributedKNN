@@ -50,7 +50,7 @@
                 <argument>20000</argument> <!-- Server Port -->
                 <argument>localhost</argument> <!-- Leader IP -->
                 <argument>20000</argument> <!-- Leader Port -->
-                <argument>1</argument> <!-- Max # Consumers -->
+                <argument>2</argument> <!-- Max # Consumers -->
                 <argument>10</argument> <!-- # K -->
                 <argument>src/main/resources/data/optdigits.tra</argument> <!-- Feature Vectors File -->
             </arguments>

@@ -38,7 +38,8 @@ public class ClientProtocol extends Protocol {
     this.masterPort = masterPort;
     this.testFile = testFile;
     this.fileTypeFlag = fileTypeFlag;
-    
+    TestData = new HashMap<>();
+    TestResult = new HashMap<>();
   }
   
   void sendMessage(int id, String message) {
@@ -59,12 +60,14 @@ public class ClientProtocol extends Protocol {
   @Override
   public void processManagerMessages(Message message) {
     String[] msgPieces = message.message.split(DELIM);
-    System.err.println(message.message);
+    //System.err.println(message.message);
     switch (msgPieces[0].charAt(0)) {
       case 'b':
         break;
       case 'e':
-        TestData.put(nInteger.parseInt(msgPieces[1]),
+        //System.err.println(msgPieces[1] + DELIM + msgPieces[2]);
+        Integer id = Integer.parseInt(msgPieces[1]);
+        TestData.put(id,
                 new FeatureVector(msgPieces[2]));
         amtData++;
         break;

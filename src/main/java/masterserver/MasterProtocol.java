@@ -106,8 +106,7 @@ public class MasterProtocol extends Protocol {
   @Override
   public void processManagerMessages(Message incomingMessage) {
     messagePieces = incomingMessage.message.split(DELIM);
-    System.out.println("Processing message from " 
-            + incomingMessage.connectedID + ": " + incomingMessage.message);
+    //System.out.println("Processing message from " + incomingMessage.connectedID + ": " + incomingMessage.message);
     switch(messagePieces[0].charAt(0)) {
       case 'r':
         System.out.println("Received producer request to be paired");
@@ -115,7 +114,7 @@ public class MasterProtocol extends Protocol {
                 messagePieces[1]);
         break;
       case 'q':
-        System.out.println("Received query request for id: "+ messagePieces[1]);
+        //System.out.println("Received query request for id: "+ messagePieces[1]);
         queryResult = knn.GetTestResult(Integer.parseInt(messagePieces[1]));
         if (queryResult == null) {
           sendMessage(incomingMessage.connectedID, "c");
@@ -146,12 +145,12 @@ public class MasterProtocol extends Protocol {
         connectToLeader(messagePieces[0], messagePieces[1]);
         break;
       case 'd':
-        System.out.println("got result");
+        //System.out.println("got result");
         int testedId = Integer.parseInt(messagePieces[1]);
         knn.AddTestedCategory(testedId, messagePieces[2]);
         if (testDataToProducer.containsKey(testedId)
                 && sockets.containsKey(testDataToProducer.get(testedId))) {
-          System.out.println("Sending to: " + testDataToProducer.get(testedId) + DELIM + testedId + DELIM + messagePieces[2]);
+          //System.out.println("Sending to: " + testDataToProducer.get(testedId) + DELIM + testedId + DELIM + messagePieces[2]);
           sendMessage(testDataToProducer.get(testedId), "q " + testedId + DELIM + messagePieces[2]);   
         }
         break;
@@ -176,11 +175,10 @@ public class MasterProtocol extends Protocol {
         sendMessage(consumerId, 
                 "p"+DELIM+vectorId+DELIM+featureVector);
     } else {
-      /*try {
+      try {
         incomingMessages.put(new Message(connectedID, "r " + featureVector));
       } catch (InterruptedException e) {
-      }*/
-      System.out.println("not enough consumers!");
+      }
     }
   }
   
@@ -232,14 +230,14 @@ public class MasterProtocol extends Protocol {
       }
     }
     
-    System.out.println("Received: " + numConnections);
+    //System.out.println("Received: " + numConnections);
     switch(acceptorMessagePieces[0].charAt(0)) {
       case 'p':
         System.out.println("producer connected");
         sendMessage(numConnections, backupString);
         break;
       case 'c':
-        System.out.println("GOT!");
+        //System.out.println("GOT!");
         if (numConsumers == maxConsumers) {
           sendMessage(numConnections, "n");
           return false;
@@ -262,7 +260,7 @@ public class MasterProtocol extends Protocol {
             return false;
           }
           sendToNotifyList(notifyList, "a " + accumulatorInfo);
-          System.out.println(accumulatorInfo);
+          //System.out.println(accumulatorInfo);
           if (!startedKNN) {
             startedKNN = true;
             knn.LoadAndDistributeTrainingDataEqually(featureVectorsFile);

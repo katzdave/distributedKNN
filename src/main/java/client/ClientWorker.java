@@ -36,7 +36,7 @@ public class ClientWorker implements Runnable{
       FeatureVectorLoader fvl = new FeatureVectorLoader();
       List<FeatureVector> features = fvl.FeatureVectorsFromTextFile(fileName);
       for(FeatureVector feature : features){
-        System.out.println("sending:" + feature.toString());
+        //System.out.println("sending:" + feature.toString());
         sendMessage("r " + feature.toString());
       }
     }

@@ -41,7 +41,7 @@ public class ConsumerProtocol extends Protocol {
   }
   
   void sendMessage(int id, String message) {
-    System.out.println(id + DELIM + message);
+    //System.out.println(id + DELIM + message);
     try {
       outgoingMessages.put(new Message(id, message));
     } catch (InterruptedException e) {
@@ -68,7 +68,7 @@ public class ConsumerProtocol extends Protocol {
         knn.setK(Integer.parseInt(msgPieces[1]));
         break;
       case 'a':
-        System.out.println("got a " + message.message);
+        //System.out.println("got a " + message.message);
         msgPieces = msgPieces[1].split(DELIM2);
         accumulatorIp = msgPieces[0];
         accumulatorPort = Integer.parseInt(msgPieces[1]);
@@ -82,7 +82,7 @@ public class ConsumerProtocol extends Protocol {
         break;
       case 't':
         //training vectors
-        System.out.println("got!");
+        //System.out.println("got!");
         knn.addTrainingVectors(message.message);
         break;
       case 'n':
