@@ -20,12 +20,18 @@ public class ClientProtocol extends Protocol {
   
   String masterIp;
   Integer masterPort;
+  String testFile;
+  Boolean fileTypeFlag; //true = regular textFile, false = listImages
   
   String backupMasterString;
   
-  public ClientProtocol(String masterIp, int masterPort) {
+  public ClientProtocol(String masterIp, int masterPort,
+          String testFile, Boolean fileTypeFlag) {
     this.masterIp = masterIp;
     this.masterPort = masterPort;
+    this.testFile = testFile;
+    this.fileTypeFlag = fileTypeFlag;
+    
   }
   
   void sendMessage(int id, String message) {
@@ -47,7 +53,11 @@ public class ClientProtocol extends Protocol {
   public void processManagerMessages(Message message) {
     String[] msgPieces = message.message.split(DELIM);
     switch (msgPieces[0].charAt(0)) {
-
+      case 'e':
+        
+        break;
+      case 'q':
+        break;
       default:
         System.err.println("Received invalid message from "
                 + message.connectedID+DELIM+message.message);
