@@ -1,4 +1,4 @@
-package src.main.java.client;
+package client;
 
 import connectionManager.Connection;
 import connectionManager.Message;
