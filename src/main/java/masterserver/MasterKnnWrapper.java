@@ -172,9 +172,8 @@ public class MasterKnnWrapper {
         for(int j=0; j<10; j++){
           out.println(results[i][j] + "\t");
         }
-        out.println();
+        //out.println();
       }
-      out.println("e end");
     }catch(IOException e){
       return false;
     }

@@ -124,8 +124,10 @@ public class MasterProtocol extends Protocol {
         break;
       case 'g':
         System.out.println("Sending stats to: "+ incomingMessage.connectedID);
+        sendMessage(incomingMessage.connectedID, "r");
         knn.ExportCurrentResultsToSocket(
                 sockets.get(incomingMessage.connectedID));
+        sendMessage(incomingMessage.connectedID, "r");
         break;
       case 'b':
         connected = true;
@@ -159,9 +161,11 @@ public class MasterProtocol extends Protocol {
         consumerListChange = false;
         consumerList = consumerConnectionData.keySet();
       }
+      int vectorId = knn.AddTestVector(featureVector);
+      sendMessage(connectedID, "e"+DELIM+vectorId+DELIM+featureVector);
       for (int consumerId : consumerList)
         sendMessage(consumerId, 
-                "p"+DELIM+knn.AddTestVector(featureVector)+DELIM+featureVector);
+                "p"+DELIM+vectorId+DELIM+featureVector);
     } else {
       try {
         incomingMessages.put(new Message(connectedID, "r " + featureVector));

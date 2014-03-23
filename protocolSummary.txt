@@ -13,9 +13,9 @@ Master to Consumer
 - p ID [featureVector] : feature vector to be processed
 
 Master to Producer
-- y ID [IP~PORT ...] : request can be received assigned ID, consumers' IP~PORT as a list delimited by spaces
 - l IP~PORT : current leader formatted as IP~PORT, need to connect to leader
 - b [IP~PORT ...] : updated backup masters list each backup formatted as IP~PORT
+- e ID [feature vector] : echo back feature vector with ID
 - q ID CATEGORY : category of query 
 - c : could not get query
 - r .... e: full results ends with a getline of "e"
@@ -40,7 +40,7 @@ Consumer to accumulator
 ===================================================
 Producer to Master
 - p : serves as identifying message
-- r [feature vector]: request to pair producer with consumers
+- r [feature vector]: request to send vector with consumers
 - q ID : query master to get category for given ID
 - g : query all, get entire file
 
