@@ -1,5 +1,7 @@
 package src.main.java.client;
 
 public class Client {
-  
+  public static void main(String args[]) {
+    
+  }
 }
