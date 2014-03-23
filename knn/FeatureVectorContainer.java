@@ -22,19 +22,27 @@ public class FeatureVectorContainer {
   static int K = 5;
   static String VectorDelim = "-";
   static int NumWorkers = 4;
+  String DELIM;
   
-  List<FeatureVector> Vectors;
+  List<FeatureVector> trainingVectors;
   
-  public FeatureVectorContainer(){
-    Vectors = new ArrayList<>();
+  public FeatureVectorContainer(int cores, String delim){
+    trainingVectors = new ArrayList<>();
+    NumWorkers = cores;
+    DELIM = delim;
   }
-    
-  public String GetKnnAsString(FeatureVector fv){
+  
+  public void setK(int k) {
+    K = k;
+  }
+  
+  public String GetKnnAsString(String featureVector){
+    FeatureVector fv = new FeatureVector(featureVector);
     PriorityBlockingQueue<CategoryDistances> pbq = new PriorityBlockingQueue<>();
     ExecutorService pool = Executors.newFixedThreadPool(NumWorkers);
     String outp = "";
     
-    for(FeatureVector elem : Vectors){
+    for(FeatureVector elem : trainingVectors){
       pool.execute(new EuclideanWorker(elem, fv, pbq));
     }
     pool.shutdown();
@@ -53,7 +61,12 @@ public class FeatureVectorContainer {
     return outp.substring(0, outp.length()-1);
   }
   
-  public void AddVector(FeatureVector fv){
-    Vectors.add(fv);
+  public void addTrainingVectors(String featureVectorBatch){
+    String [] tVectors = featureVectorBatch.split(DELIM);
+    FeatureVector fv;
+    for (int i = 1; i != tVectors.length; ++i) {
+      fv = new FeatureVector(tVectors[i]);
+      trainingVectors.add(fv);
+    }
   }
 }

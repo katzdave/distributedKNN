@@ -27,7 +27,8 @@ public class Consumer {
             new ConsumerProtocol(
                     myServerPort, 
                     args[1], 
-                    masterPort);
+                    masterPort,
+                    numCores);
     ConnectionManager consumer;
     try {
       consumer = new ConnectionManager(myServerPort, 

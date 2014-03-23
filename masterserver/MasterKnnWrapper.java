@@ -70,12 +70,14 @@ public class MasterKnnWrapper {
     List<FeatureVector> vectors;
     for(int i=0; i<numConsumers; i++){
       vectors = TrainingData.get(consumerIds[i]);
+      String msg = "t";
       for (FeatureVector current : vectors) {
-        try {
-          outgoingMessages.put(new Message(consumerIds[i], "m " + current.toString()));
-        } catch (InterruptedException ex) {
-          System.err.println("Interrupted sending of feature vectors");
-        }
+        msg += (" " + current.toString());
+      }
+      try {
+        outgoingMessages.put(new Message(consumerIds[i], msg));
+      } catch (InterruptedException ex) {
+        System.err.println("Interrupted sending of feature vectors");
       }
     }
   }

@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import knn.FeatureVectorContainer;
 
 /**
  *
@@ -27,11 +28,16 @@ public class ConsumerProtocol extends Protocol {
   Integer accumulatorPort;
   
   String backupMasterString;
+  FeatureVectorContainer knn;
   
-  public ConsumerProtocol(int myServerPort, String masterIp, int masterPort) {
+  public ConsumerProtocol(int myServerPort, 
+                          String masterIp, 
+                          int masterPort,
+                          int numCores) {
     this.myServerPort = myServerPort;
     this.masterIp = masterIp;
     this.masterPort = masterPort;
+    knn = new FeatureVectorContainer(numCores, DELIM);
   }
   
   void sendMessage(int id, String message) {
@@ -58,6 +64,7 @@ public class ConsumerProtocol extends Protocol {
         backupMasterString = message.message;
         break;
       case 'k':
+        knn.setK(Integer.parseInt(msgPieces[1]));
         break;
       case 'a':
         msgPieces = msgPieces[1].split(DELIM2);
@@ -71,8 +78,9 @@ public class ConsumerProtocol extends Protocol {
         masterPort = Integer.parseInt(msgPieces[1]);
         connectToMaster();
         break;
-      case 'm':
-        //train vector
+      case 't':
+        //training vectors
+        knn.addTrainingVectors(message.message);
         break;
       case 'n':
         try { Thread.sleep(10000); } catch (InterruptedException e) {}
@@ -80,6 +88,16 @@ public class ConsumerProtocol extends Protocol {
           connectToMaster();
         break;
       case 'p':
+        if (sockets.containsKey(accumulatorId)) {
+          sendMessage(accumulatorId, 
+                "a"+DELIM+msgPieces[1]+DELIM+knn.GetKnnAsString(msgPieces[2]));
+        } else {
+          try {
+            incomingMessages.put(
+                    new Message(message.connectedID, message.message));
+          } catch (InterruptedException e) {  
+          }
+        }
         break;
       case 'y':
         System.out.println("Connected to accumulator at " 
@@ -127,7 +145,6 @@ public class ConsumerProtocol extends Protocol {
   
   void handleAccumulatorDisconnection() {
     System.out.println("Accumulator Disconnected");
-    //logic here
   }
   
   @Override
