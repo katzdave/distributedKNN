@@ -1,4 +1,4 @@
-package client;
+package src.main.java.client;
 
 import connectionManager.Connection;
 import connectionManager.Message;
@@ -7,6 +7,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.HashMap;
+import knn.FeatureVector;
 
 /**
  *
@@ -24,6 +26,11 @@ public class ClientProtocol extends Protocol {
   Boolean fileTypeFlag; //true = regular textFile, false = listImages
   
   String backupMasterString;
+  
+  HashMap<Integer, FeatureVector> TestData;
+  HashMap<Integer, String> TestResult;
+  int amtData = 0;
+  int amtResult = 0;
   
   public ClientProtocol(String masterIp, int masterPort,
           String testFile, Boolean fileTypeFlag) {
@@ -54,9 +61,13 @@ public class ClientProtocol extends Protocol {
     String[] msgPieces = message.message.split(DELIM);
     switch (msgPieces[0].charAt(0)) {
       case 'e':
-        
+        TestData.put(Integer.parseInt(msgPieces[1]),
+                new FeatureVector(msgPieces[2]));
+        amtData++;
         break;
       case 'q':
+        TestResult.put(Integer.parseInt(msgPieces[1]), msgPieces[2]);
+        amtResult++;
         break;
       default:
         System.err.println("Received invalid message from "
@@ -111,6 +122,7 @@ public class ClientProtocol extends Protocol {
                                             this);
       connection.start();
       sendMessage(masterId, "p");
+      (new Thread(new ClientWorker(outgoingMessages,testFile,fileTypeFlag))).start();
     } catch (IOException ex) {
       System.err.println("Couldn't connect to master!");
     }
