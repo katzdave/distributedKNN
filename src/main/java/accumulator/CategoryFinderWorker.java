@@ -39,7 +39,7 @@ public class CategoryFinderWorker implements Runnable{
       String toSend = "d " + MyCategoryFinder.ID + " " + category;
       try{
         Outgoing.put(new Message(MasterId, toSend));
-        System.err.println("sending to master: " + toSend);
+        //System.err.println("sending to master: " + toSend);
       }catch(InterruptedException e){
         System.err.println("Failed to send message to master");
       }

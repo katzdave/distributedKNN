@@ -109,7 +109,7 @@ public class MasterProtocol extends Protocol {
     //System.out.println("Processing message from " + incomingMessage.connectedID + ": " + incomingMessage.message);
     switch(messagePieces[0].charAt(0)) {
       case 'r':
-        System.out.println("Received producer request to be paired");
+        //System.out.println("Received producer request to be paired");
         sendVectorToConsumers(incomingMessage.connectedID, 
                 messagePieces[1]);
         break;
