@@ -8,7 +8,7 @@ Master to Consumer
 - k NUMK : k for KNN algorithm
 - l IP~PORT : current leader formatted as IP~PORT, need to connect to leader
 - b [IP~PORT ...] : updated backup masters list each backup formatted as IP~PORT
-- m [featureVec     tor]: sends a training feature vector with its ID to consumer
+- m [featureVector]: sends a training feature vector with its ID to consumer
 - n : reject the connection since numConsumers == maxConsumers
 
 Master to Producer
@@ -18,6 +18,7 @@ Master to Producer
 - b [IP~PORT ...] : updated backup masters list each backup formatted as IP~PORT
 - q ID CATEGORY : category of query 
 - c : could not get query
+- r .... e: full results ends with a getline of "e"
 
 Master to Master
 - s PORT : request to be added as a backup with server socket port PORT
@@ -34,21 +35,21 @@ Consumer to Master
 - c PORT : identifying message to master upon connection to master serversocket
 
 Consumer to accumulator
-- c : identifying message
-- a ID CATEGORY : for a feature vector
+- a [ID CATEGORY ...] : for a feature vectors, batched for k
 ===================================================
 Producer to Master
 - p : serves as identifying message
 - r [feature vector]: request to pair producer with consumers
 - q ID : query master to get category for given ID
+- g : query all, get entire file
 
 Producer to Consumer
 - p ID [featureVector] : feature vector to be processed
 
 ====================================================
 accumulator to consumer
-- y : yes accepted connection
-- g : rejected connection
+- y : accepted connection
+- n : rejected connection
 
 accumulator to master
 - a PORT: identifying message
@@ -58,12 +59,10 @@ accumulator to accumulator
 - b [IP~PORT ...] : updated backup accumulators list each backup formatted as IP~PORT
 - s PORT : request to be added as a backup with server socket port PORT
 - h IP~PORT : current lead accumulator to connect to
-- o IP~PORT : leader for accumulator
 
 
-tentative handling disconnections
-if... master disconnects, accumulator keeps a copy of results on it
-when master sends queried result to client, then master sends to accumulator a done
-
-if... accumulator disconnects, backup replaces it, master sends it all the non-verified IDs
-consumers resend their information
+possible disconnection protocol:
+if consumer disconnects master can tell the client to resends a vector with a certain ID to the replacement consumer
+if master disconnects then we do what you suggested using a queue
+if accumulator disconnects master can do the same as if a consumer disconnects
+tell the client to resend an entire vectorto all consumers

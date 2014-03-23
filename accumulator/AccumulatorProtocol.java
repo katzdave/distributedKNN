@@ -8,7 +8,6 @@ package accumulator;
 
 import connectionManager.*;
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Inet4Address;
@@ -59,9 +58,11 @@ public class AccumulatorProtocol extends Protocol{
   ExecutorService pool;
   
   /**
+   * @param myServerPort
+   * @param leaderAccumulatorIP
+   * @param leaderPort
    * @param masterIp
    * @param masterPort
-   * @param myPort
    * @param cores
    */
   public AccumulatorProtocol(int myServerPort,
@@ -118,11 +119,10 @@ public class AccumulatorProtocol extends Protocol{
       }
     }
     
-    //TO DO for consumer
     switch(acceptorMessagePieces[0].charAt(0)) {
       case 'c':
         if (numConsumers == maxConsumers) {
-          sendMessage(numConnections, "n");
+          sendMessage(numConnections, "n");        
           return false;
         } else {
           sendMessage(numConnections, "y");
@@ -163,8 +163,8 @@ public class AccumulatorProtocol extends Protocol{
         if(!categoryFinders.containsKey(id)){
           categoryFinders.put(id, new CategoryFinder(id, maxConsumers, K));
         }
-        pool.submit(new CategoryFinderWorker(
-                msgPieces[2], categoryFinders.get(id), outgoingMessages));        
+        pool.submit(new CategoryFinderWorker(msgPieces[2], 
+                categoryFinders.get(id), outgoingMessages));        
         break;
       case 'h':
         //connect to leader accumulator

@@ -109,7 +109,7 @@ public class MasterProtocol extends Protocol {
     switch(messagePieces[0].charAt(0)) {
       case 'r':
         System.out.println("Received producer request to be paired");
-        handlePairClientWithConsumer(incomingMessage.connectedID,
+        handlePairClientWithConsumer(incomingMessage.connectedID, 
                 messagePieces[1]);
         break;
       case 'q':
@@ -121,6 +121,11 @@ public class MasterProtocol extends Protocol {
           sendMessage(incomingMessage.connectedID, 
                       "q " + messagePieces[1] + DELIM + queryResult);
         }          
+        break;
+      case 'g':
+        System.out.println("Sending stats to: "+ incomingMessage.connectedID);
+        knn.ExportCurrentResultsToSocket(
+                sockets.get(incomingMessage.connectedID));
         break;
       case 'b':
         connected = true;
@@ -147,6 +152,7 @@ public class MasterProtocol extends Protocol {
   }
   
   //handles pairing request from client
+  //void handlePairClientWithConsumer (int connectedID, String featureVector) {
   void handlePairClientWithConsumer (int connectedID, String featureVector) {
     if (numConsumers == maxConsumers) {
       while (consumerStringChange) {
@@ -158,7 +164,7 @@ public class MasterProtocol extends Protocol {
         consumerStringChange = false;
       }
       sendMessage(connectedID,
-                  "y " + knn.AddTestVector(featureVector) + consumerString);
+              "y " + knn.AddTestVector(featureVector) + consumerString);
     } else {
       sendMessage(connectedID, "n");
     }

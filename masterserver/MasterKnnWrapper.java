@@ -7,9 +7,9 @@
 package masterserver;
 
 import connectionManager.Message;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -109,8 +109,11 @@ public class MasterKnnWrapper {
     return true;
   }
   
-  public int AddTestVector(String featureVector){
+  //public int AddTestVector(String featureVector){
+  public int AddTestVector(String featureVector) {
     FeatureVector fv = new FeatureVector(featureVector);
+    while (TestResult.containsKey(LastTestId))
+      ++LastTestId;
     TestData.put(new Integer(LastTestId), fv);
     TestResult.put(new Integer(LastTestId), null);
     return LastTestId++;
@@ -121,7 +124,6 @@ public class MasterKnnWrapper {
   }
           
   //NOTE: Will return null if test incomplete or invalid
-  //Not sure if these cases being indistinguishable is a problem
   public String GetTestResult(int id){
     if(!TestResult.containsKey(id)){
       //INVALID ID
@@ -131,7 +133,7 @@ public class MasterKnnWrapper {
     }
   }
   
-  public boolean ExportCurrentResultsToTextFile(String filename){
+  public boolean ExportCurrentResultsToSocket(Socket outSocket){
     int[][] results = new int[10][10];
     for (int[] row : results)
       Arrays.fill(row, 0);
@@ -156,7 +158,7 @@ public class MasterKnnWrapper {
     double overallAccuracy = (double)totalCorrect * 100 / (double)total;
     
     try{
-      PrintWriter out = new PrintWriter(new FileWriter(filename));
+      PrintWriter out = new PrintWriter(outSocket.getOutputStream());
       out.println(String.format(
               "%d Total Results, %d Correct: %.2f% Percent Accuracy",
               total, totalCorrect, overallAccuracy));
@@ -170,7 +172,7 @@ public class MasterKnnWrapper {
         }
         out.println();
       }
-      
+      out.println("e end");
     }catch(IOException e){
       return false;
     }
