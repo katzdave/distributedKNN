@@ -68,6 +68,9 @@ public class ClientProtocol extends Protocol {
       case 'q':
         TestResult.put(Integer.parseInt(msgPieces[1]), msgPieces[2]);
         amtResult++;
+        if(amtData == amtResult){
+          System.out.println("Whipdedoo");
+        }
         break;
       default:
         System.err.println("Received invalid message from "
