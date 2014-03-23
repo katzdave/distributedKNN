@@ -60,7 +60,7 @@ public class OpticalCharRec {
           fv.Features[i] = new Feature(Double.parseDouble(splat[i]));
         }
         CategoryFinder cf = new CategoryFinder(1);
-        String s = fc.GetKnnAsString(fv);
+        String s = fc.GetKnnAsString(fv.toString());
         cf.AddListFromString(s);
         String category = cf.GetCategory();
         

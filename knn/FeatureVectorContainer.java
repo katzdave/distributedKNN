@@ -32,6 +32,10 @@ public class FeatureVectorContainer {
     DELIM = delim;
   }
   
+  public FeatureVectorContainer() {
+    trainingVectors = new ArrayList<>();
+  }
+  
   public void setK(int k) {
     K = k;
   }
@@ -59,6 +63,10 @@ public class FeatureVectorContainer {
     }
     
     return outp.substring(0, outp.length()-1);
+  }
+  
+  public void AddVector(FeatureVector fv) {
+    trainingVectors.add(fv);
   }
   
   public void addTrainingVectors(String featureVectorBatch){
