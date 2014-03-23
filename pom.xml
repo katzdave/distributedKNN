@@ -47,12 +47,12 @@
         <configuration>
             <mainClass>masterserver.MasterServer</mainClass>
             <arguments>
-                <argument></argument> <!-- Server Port -->
-                <argument></argument> <!-- Leader IP -->
-                <argument></argument> <!-- Leader Port -->
-                <argument></argument> <!-- Max # Consumers -->
-                <argument></argument> <!-- # K -->
-                <argument></argument> <!-- Feature Vectors File -->
+                <argument>20000</argument> <!-- Server Port -->
+                <argument>localhost</argument> <!-- Leader IP -->
+                <argument>20000</argument> <!-- Leader Port -->
+                <argument>1</argument> <!-- Max # Consumers -->
+                <argument>10</argument> <!-- # K -->
+                <argument>src/main/resources/data/optdigits.tra</argument> <!-- Feature Vectors File -->
             </arguments>
         </configuration>
     </plugin></plugins></build></profile>
@@ -73,9 +73,9 @@
         <configuration>
             <mainClass>consumer.Consumer</mainClass>
             <arguments>
-                <argument></argument> <!-- Consumer Port -->
-                <argument></argument> <!-- Master IP -->
-                <argument></argument> <!-- Master Port -->
+                <argument>20001</argument> <!-- Consumer Port -->
+                <argument>localhost</argument> <!-- Master IP -->
+                <argument>20000</argument> <!-- Master Port -->
             </arguments>
         </configuration>
     </plugin></plugins></build></profile>
@@ -96,9 +96,11 @@
         <configuration>
             <mainClass>client.Client</mainClass>
             <arguments>
-                <argument></argument> <!--  -->
-                <argument></argument> <!--  -->
-                <argument></argument> <!--  -->
+                <argument>localhost</argument> <!--  masterIp-->
+                <argument>20000</argument> <!--  masterPort-->
+                <argument>src/main/resources/data/optdigits.tes</argument> <!--  test file-->
+                <argument>txt</argument> <!--  txt file or else-->
+                <argument>30000</argument> <!--  useless arg-->
             </arguments>
         </configuration>
     </plugin></plugins></build></profile>
@@ -119,11 +121,11 @@
         <configuration>
             <mainClass>accumulator.Accumulator</mainClass>
             <arguments>
-                <argument></argument> <!-- serverPort -->
-                <argument></argument> <!--  leaderAccumulatorIP -->
-                <argument></argument> <!-- leaderPort -->
-                <argument></argument> <!-- masterIp -->
-                <argument></argument> <!-- masterPort -->
+                <argument>25000</argument> <!-- serverPort -->
+                <argument>localhost</argument> <!--  leaderAccumulatorIP -->
+                <argument>25000</argument> <!-- leaderPort -->
+                <argument>localhost</argument> <!-- masterIp -->
+                <argument>20000</argument> <!-- masterPort -->
             </arguments>
         </configuration>
     </plugin></plugins></build></profile>

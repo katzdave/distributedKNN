@@ -13,7 +13,7 @@ public class Client {
    * @param args 
    */
   public static void main(String [] args) {
-   if (args.length != 4) {
+   if (args.length != 5) {
       System.out.println("Invalid number of arguments");
       System.exit(1);
     }
