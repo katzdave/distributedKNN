@@ -146,15 +146,14 @@ public class MasterProtocol extends Protocol {
         connectToLeader(messagePieces[0], messagePieces[1]);
         break;
       case 'd':
+        System.out.println("got result");
         int testedId = Integer.parseInt(messagePieces[1]);
         knn.AddTestedCategory(testedId, messagePieces[2]);
         if (testDataToProducer.containsKey(testedId)
                 && sockets.containsKey(testDataToProducer.get(testedId))) {
-          sendMessage(testDataToProducer.get(testedId), messagePieces[2]);   
+          System.out.println("Sending to: " + testDataToProducer.get(testedId) + DELIM + testedId + DELIM + messagePieces[2]);
+          sendMessage(testDataToProducer.get(testedId), "q " + testedId + DELIM + messagePieces[2]);   
         }
-        break;
-      case 'c':
-        System.out.println("wtf");
         break;
       default:
         System.err.println("Received invalid message from clientID: "
@@ -263,6 +262,7 @@ public class MasterProtocol extends Protocol {
             return false;
           }
           sendToNotifyList(notifyList, "a " + accumulatorInfo);
+          System.out.println(accumulatorInfo);
           if (!startedKNN) {
             startedKNN = true;
             knn.LoadAndDistributeTrainingDataEqually(featureVectorsFile);

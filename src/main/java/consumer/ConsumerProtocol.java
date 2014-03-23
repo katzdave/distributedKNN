@@ -68,6 +68,7 @@ public class ConsumerProtocol extends Protocol {
         knn.setK(Integer.parseInt(msgPieces[1]));
         break;
       case 'a':
+        System.out.println("got a " + message.message);
         msgPieces = msgPieces[1].split(DELIM2);
         accumulatorIp = msgPieces[0];
         accumulatorPort = Integer.parseInt(msgPieces[1]);
@@ -178,7 +179,7 @@ public class ConsumerProtocol extends Protocol {
     System.out.println("Attempting to connect to accumulator");
     Socket accSocket;
     try {
-      accSocket = new Socket(accumulatorIp, masterPort);
+      accSocket = new Socket(accumulatorIp, accumulatorPort);
       BufferedReader masterStream = new BufferedReader(
               new InputStreamReader(accSocket.getInputStream()));
       sockets.put(accumulatorId, accSocket);

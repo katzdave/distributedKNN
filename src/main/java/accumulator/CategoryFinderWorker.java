@@ -15,7 +15,7 @@ import knn.CategoryFinder;
  * @author David
  */
 public class CategoryFinderWorker implements Runnable{
-  static int MasterId = -1;
+  static int MasterId = -2;
   
   String Message;
   CategoryFinder MyCategoryFinder;
@@ -23,10 +23,12 @@ public class CategoryFinderWorker implements Runnable{
 
   CategoryFinderWorker(String message,
           CategoryFinder cf,
-          BlockingQueue<Message> outgoing){
+          BlockingQueue<Message> outgoing,
+          Integer masterId){
     Message = message;
     MyCategoryFinder = cf;
     Outgoing = outgoing;
+    MasterId = masterId;
   }
   
   @Override
@@ -37,6 +39,7 @@ public class CategoryFinderWorker implements Runnable{
       String toSend = "d " + MyCategoryFinder.ID + " " + category;
       try{
         Outgoing.put(new Message(MasterId, toSend));
+        System.err.println("sending to master: " + toSend);
       }catch(InterruptedException e){
         System.err.println("Failed to send message to master");
       }

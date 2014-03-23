@@ -90,6 +90,7 @@ public class AccumulatorProtocol extends Protocol{
   
   void sendMessage(int id, String message) {
     try {
+      System.out.println(id + DELIM + message);
       outgoingMessages.put(new Message(id, message));
     } catch (InterruptedException e) {
       System.out.println("Interrupted sending message to"+id+DELIM+message);
@@ -119,6 +120,7 @@ public class AccumulatorProtocol extends Protocol{
       }
     }
     
+    System.err.println("acceptor message got: "+ acceptorMessagePieces[0]);
     switch(acceptorMessagePieces[0].charAt(0)) {
       case 'c':
         if (numConsumers == maxConsumers) {
@@ -156,6 +158,7 @@ public class AccumulatorProtocol extends Protocol{
   @Override
   public void processManagerMessages(Message message) {
     String[] msgPieces = message.message.split(DELIM);
+    System.err.println(message.message);
     switch (msgPieces[0].charAt(0)) {
       case 'a':
         //consumer to me
@@ -164,7 +167,7 @@ public class AccumulatorProtocol extends Protocol{
           categoryFinders.put(id, new CategoryFinder(id, maxConsumers, K));
         }
         pool.submit(new CategoryFinderWorker(msgPieces[2], 
-                categoryFinders.get(id), outgoingMessages));        
+                categoryFinders.get(id), outgoingMessages, masterId));        
         break;
       case 'h':
         //connect to leader accumulator

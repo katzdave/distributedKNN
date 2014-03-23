@@ -59,9 +59,12 @@ public class ClientProtocol extends Protocol {
   @Override
   public void processManagerMessages(Message message) {
     String[] msgPieces = message.message.split(DELIM);
+    System.err.println(message.message);
     switch (msgPieces[0].charAt(0)) {
+      case 'b':
+        break;
       case 'e':
-        TestData.put(Integer.parseInt(msgPieces[1]),
+        TestData.put(nInteger.parseInt(msgPieces[1]),
                 new FeatureVector(msgPieces[2]));
         amtData++;
         break;
