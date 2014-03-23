@@ -22,19 +22,17 @@
         <target>1.7</target>
       </configuration>
     </plugin>
-    
-    <plugin>
-        
-    </plugin>
   </plugins>
 </build>
+
 
 <profiles>
 
     <!-- Master Server -->
     <profile><activation><property><name>
         master
-    </name><id>master</id></property></activation>
+    </name></property></activation>
+    <id>master</id>
     <build><plugins><plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -49,12 +47,12 @@
         <configuration>
             <mainClass>masterserver.MasterServer</mainClass>
             <arguments>
-                <argument>1</argument> <!-- Server Port -->
-                <argument>2</argument> <!-- Leader IP -->
-                <argument>3</argument> <!-- Leader Port -->
-                <argument>4</argument> <!-- Max # Consumers -->
-                <argument>5</argument> <!-- # K -->
-                <argument>6</argument> <!-- Feature Vectors File -->
+                <argument></argument> <!-- Server Port -->
+                <argument></argument> <!-- Leader IP -->
+                <argument></argument> <!-- Leader Port -->
+                <argument></argument> <!-- Max # Consumers -->
+                <argument></argument> <!-- # K -->
+                <argument></argument> <!-- Feature Vectors File -->
             </arguments>
         </configuration>
     </plugin></plugins></build></profile>
@@ -63,6 +61,7 @@
     <profile><activation><property><name>
         consumer
     </name></property></activation>
+    <id>consumer</id>
     <build><plugins><plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -74,9 +73,57 @@
         <configuration>
             <mainClass>consumer.Consumer</mainClass>
             <arguments>
-                <argument>1</argument> <!-- Consumer Port -->
-                <argument>2</argument> <!-- Master IP -->
-                <argument>3</argument> <!-- Master Port -->
+                <argument></argument> <!-- Consumer Port -->
+                <argument></argument> <!-- Master IP -->
+                <argument></argument> <!-- Master Port -->
+            </arguments>
+        </configuration>
+    </plugin></plugins></build></profile>
+    
+    <!-- Client -->
+    <profile><activation><property><name>
+        client
+    </name></property></activation>
+    <id>client</id>
+    <build><plugins><plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.2.1</version>
+        <executions><execution><goals><goal>
+            java
+        </goal></goals></execution></executions>
+        
+        <configuration>
+            <mainClass>client.Client</mainClass>
+            <arguments>
+                <argument></argument> <!--  -->
+                <argument></argument> <!--  -->
+                <argument></argument> <!--  -->
+            </arguments>
+        </configuration>
+    </plugin></plugins></build></profile>
+    
+    <!-- Accumulator -->
+    <profile><activation><property><name>
+        accumulator
+    </name></property></activation>
+    <id>accumulator</id>
+    <build><plugins><plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.2.1</version>
+        <executions><execution><goals><goal>
+            java
+        </goal></goals></execution></executions>
+        
+        <configuration>
+            <mainClass>accumulator.Accumulator</mainClass>
+            <arguments>
+                <argument></argument> <!-- serverPort -->
+                <argument></argument> <!--  leaderAccumulatorIP -->
+                <argument></argument> <!-- leaderPort -->
+                <argument></argument> <!-- masterIp -->
+                <argument></argument> <!-- masterPort -->
             </arguments>
         </configuration>
     </plugin></plugins></build></profile>
