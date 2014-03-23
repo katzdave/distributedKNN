@@ -40,8 +40,8 @@ public class MasterProtocol extends Protocol {
   Boolean startedKNN;
   String queryResult;
   
-  String consumerString;
-  Boolean consumerStringChange;
+  Set<Integer> consumerList;
+  Boolean consumerListChange;
   
   //information regarding connectiong to leader
   String backupString = "b";
@@ -72,7 +72,7 @@ public class MasterProtocol extends Protocol {
     super();
     accumulatorId = defaultAccumulatorId;
     startedKNN = false;
-    consumerStringChange = true;
+    consumerListChange = true;
     this.numK = numK;
     this.numConsumers = 0;
     this.maxConsumers = maxConsumers;
@@ -109,7 +109,7 @@ public class MasterProtocol extends Protocol {
     switch(messagePieces[0].charAt(0)) {
       case 'r':
         System.out.println("Received producer request to be paired");
-        handlePairClientWithConsumer(incomingMessage.connectedID, 
+        sendVectorToConsumers(incomingMessage.connectedID, 
                 messagePieces[1]);
         break;
       case 'q':
@@ -153,20 +153,20 @@ public class MasterProtocol extends Protocol {
   
   //handles pairing request from client
   //void handlePairClientWithConsumer (int connectedID, String featureVector) {
-  void handlePairClientWithConsumer (int connectedID, String featureVector) {
+  void sendVectorToConsumers (int connectedID, String featureVector) {
     if (numConsumers == maxConsumers) {
-      while (consumerStringChange) {
-        consumerString = "";
-        Collection<String> consumers = consumerConnectionData.values();
-        for (String consumer : consumers) {
-          consumerString += (DELIM + consumer);
-        }
-        consumerStringChange = false;
+      if (consumerListChange) {
+        consumerListChange = false;
+        consumerList = consumerConnectionData.keySet();
       }
-      sendMessage(connectedID,
-              "y " + knn.AddTestVector(featureVector) + consumerString);
+      for (int consumerId : consumerList)
+        sendMessage(consumerId, 
+                "p"+DELIM+knn.AddTestVector(featureVector)+DELIM+featureVector);
     } else {
-      sendMessage(connectedID, "n");
+      try {
+        incomingMessages.put(new Message(connectedID, "r " + featureVector));
+      } catch (InterruptedException e) {
+      }
     }
   }
   
@@ -183,7 +183,7 @@ public class MasterProtocol extends Protocol {
       System.out.println("The accumulator disconnected!");
     } else if (consumerConnectionData.containsKey(connectedID)) {
       --numConsumers;
-      consumerStringChange = true;
+      consumerListChange = true;
       consumerConnectionData.remove(connectedID);
     } else if (backupsConnectionData.containsKey(connectedID) && isLeader) {
       handleBackupDisconnection(connectedID);
@@ -227,7 +227,7 @@ public class MasterProtocol extends Protocol {
           return false;
         }
         ++numConsumers;
-        consumerStringChange = true;
+        consumerListChange = true;
         connectionData = 
                 (cSocket.getInetAddress().getHostAddress().toString() 
                 + DELIM2 + acceptorMessagePieces[1]);

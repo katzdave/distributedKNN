@@ -55,7 +55,6 @@ public class ConsumerProtocol extends Protocol {
     return true;
   }
 
-  //TO DO stuff here
   @Override
   public void processManagerMessages(Message message) {
     String[] msgPieces = message.message.split(DELIM);
@@ -117,7 +116,7 @@ public class ConsumerProtocol extends Protocol {
     } else if (connectedID == accumulatorId) {
       handleAccumulatorDisconnection();
     } else {
-      System.out.println("A producer disconnected");
+      System.out.println("Bug!");
     }
   }
   
