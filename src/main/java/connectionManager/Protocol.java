@@ -25,7 +25,7 @@ public abstract class Protocol {
     incomingMessages = new LinkedBlockingQueue<>();
     outgoingMessages = new LinkedBlockingQueue<>();
   }
-  
+
   /**
    * 
    * @param numConnections

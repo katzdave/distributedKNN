@@ -42,8 +42,9 @@ public class ClientProtocol extends Protocol {
     TestData = new HashMap<>();
     TestResult = new HashMap<>();
   }
-  
+
   void sendMessage(int id, String message) {
+    //System.out.println(id + DELIM + message);
     try {
       outgoingMessages.put(new Message(id, message));
     } catch (InterruptedException e) {

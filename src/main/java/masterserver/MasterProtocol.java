@@ -95,7 +95,8 @@ public class MasterProtocol extends Protocol {
     testDataToProducer = new HashMap<>();
   }
   
-  public void sendMessage(int id, String message) {
+  void sendMessage(int id, String message) {
+    //System.out.println(id + DELIM + message);
     try {
       outgoingMessages.put(new Message(id, message));
     } catch (InterruptedException e) {

@@ -22,6 +22,7 @@ public class ConsumerProtocol extends Protocol {
   
   String masterIp;
   Integer masterPort;
+  Boolean connectedToMaster;
   
   String accumulatorIp;
   Integer accumulatorPort;
@@ -35,6 +36,7 @@ public class ConsumerProtocol extends Protocol {
     this.masterIp = masterIp;
     this.masterPort = masterPort;
     knn = new FeatureVectorContainer(numCores, DELIM);
+    connectedToMaster = false;
   }
   
   void sendMessage(int id, String message) {
@@ -83,7 +85,12 @@ public class ConsumerProtocol extends Protocol {
         knn.addTrainingVectors(message.message);
         break;
       case 'n':
-        try { Thread.sleep(10000); } catch (InterruptedException e) {}
+        connectedToMaster = false;
+        try {
+          sockets.get(masterId).close();
+        } catch (IOException e) {}
+        sockets.remove(masterId);
+        try { Thread.sleep(1000); } catch (InterruptedException e) {}
         if (!sockets.containsKey(masterId))
           connectToMaster();
         break;
@@ -112,10 +119,11 @@ public class ConsumerProtocol extends Protocol {
   @Override
   public void handleDisconnection(int connectedID) {
     sockets.remove(connectedID);
-    if (connectedID == masterId) {
+    if (connectedID == masterId && connectedToMaster) {
       handleMasterDisconnection();
     } else if (connectedID == accumulatorId) {
       handleAccumulatorDisconnection();
+    } else if (!connectedToMaster) {
     } else {
       System.out.println("Bug!");
     }
@@ -167,6 +175,7 @@ public class ConsumerProtocol extends Protocol {
                                             this);
       connection.start();
       sendMessage(masterId, "c");
+      connectedToMaster = true;
     } catch (IOException ex) {
       System.err.println("Couldn't connect to master!");
     }

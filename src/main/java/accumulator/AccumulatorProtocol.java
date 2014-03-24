@@ -120,7 +120,7 @@ public class AccumulatorProtocol extends Protocol{
       }
     }
     
-    //System.err.println("acceptor message got: "+ acceptorMessagePieces[0]);
+    System.err.println("acceptor message got: "+ acceptorMessagePieces[0]);
     switch(acceptorMessagePieces[0].charAt(0)) {
       case 'c':
         if (numConsumers == maxConsumers) {
@@ -134,7 +134,7 @@ public class AccumulatorProtocol extends Protocol{
         String connectionData = 
                 (cSocket.getInetAddress().getHostAddress().toString() 
                 + DELIM2 + acceptorMessagePieces[1]);
-        acceptorMessagePieces = backupAccumulatorString.split(DELIM);
+        //acceptorMessagePieces = backupAccumulatorString.split(DELIM);
         backupsConnectionData.put(numConnections, connectionData);
         if (!accumulatorList.contains(connectionData)) {
           backupAccumulatorString += (DELIM +connectionData);
