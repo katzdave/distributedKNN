@@ -174,6 +174,7 @@ public class MasterKnnWrapper {
         }
         //out.println();
       }
+      out.close();
     }catch(IOException e){
       return false;
     }

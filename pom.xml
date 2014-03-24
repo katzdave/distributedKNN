@@ -98,8 +98,8 @@
             <arguments>
                 <argument>localhost</argument> <!--  masterIp-->
                 <argument>20000</argument> <!--  masterPort-->
-                <argument>src/main/resources/data/optdigits.tes</argument> <!--  test file-->
-                <argument>txt</argument> <!--  txt file or else-->
+                <argument>src/main/resources/data/numbers.tes</argument> <!--  test file-->
+                <argument>img</argument> <!--  txt file or else-->
                 <argument>30000</argument> <!--  useless arg-->
             </arguments>
         </configuration>

@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.HashMap;
 import knn.FeatureVector;
+import knn.FeatureVectorLoader;
 
 /**
  *
@@ -27,7 +28,7 @@ public class ClientProtocol extends Protocol {
   
   String backupMasterString;
   
-  HashMap<Integer, FeatureVector> TestData;
+  HashMap<FeatureVector, Integer> TestData;
   HashMap<Integer, String> TestResult;
   int amtData = 0;
   int amtResult = 0;
@@ -66,16 +67,25 @@ public class ClientProtocol extends Protocol {
         break;
       case 'e':
         //System.err.println(msgPieces[1] + DELIM + msgPieces[2]);
-        Integer id = Integer.parseInt(msgPieces[1]);
-        TestData.put(id,
-                new FeatureVector(msgPieces[2]));
+        TestData.put(new FeatureVector(msgPieces[2]),
+                Integer.parseInt(msgPieces[1]));
         amtData++;
         break;
       case 'q':
         TestResult.put(Integer.parseInt(msgPieces[1]), msgPieces[2]);
         amtResult++;
         if(amtData == amtResult){
-          System.out.println("Whipdedoo");
+          if(fileTypeFlag){
+            FeatureVectorLoader fvl = new FeatureVectorLoader();
+            fvl.ExportCurrentResultsToFile("./src/main/resources/data/optdigits.res"
+                                    ,TestData,TestResult);
+          }else{
+            FeatureVectorLoader fvl = new FeatureVectorLoader();
+            fvl.ExportCurrentResultsToFile("./src/main/resources/data/numbers.html"
+                                    ,testFile,TestData,TestResult);
+          }
+          System.out.println("Test complete!");
+          System.exit(0);
         }
         break;
       default:

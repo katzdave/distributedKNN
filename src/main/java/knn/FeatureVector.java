@@ -39,6 +39,7 @@ public class FeatureVector{
   
   public FeatureVector(BufferedImage img, String s){
     Category = s;
+    Features = new Feature[NumFeatures];
     for(int i=0; i<8; i++){
       for(int j=0; j<8; j++){
         int count = 0;
@@ -79,4 +80,15 @@ public class FeatureVector{
     }
     return out + Category;
   }
+
+  // @Override
+  // public boolean equals(Object oth){
+  //   FeatureVector other = (FeatureVector) oth;
+  //   for(int i=0; i<NumFeatures; i++){
+  //     if(this.Features[i] != other.Features[1]){
+  //       return false;
+  //     }
+  //   }
+  //   return true;
+  // }
 }

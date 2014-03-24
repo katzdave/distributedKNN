@@ -39,6 +39,12 @@ public class ClientWorker implements Runnable{
         //System.out.println("sending:" + feature.toString());
         sendMessage("r " + feature.toString());
       }
+    }else{
+      FeatureVectorLoader fvl = new FeatureVectorLoader();
+      List<FeatureVector> features = fvl.FeatureVectorsFromImageFileList(fileName);
+      for(FeatureVector feature : features){
+        sendMessage("r " + feature.toString());
+      }
     }
     
   }
@@ -47,7 +53,7 @@ public class ClientWorker implements Runnable{
     try {
       outgoingMessages.put(new Message(id, message));
     } catch (InterruptedException e) {
-      System.out.println("Interrupted sending message cliennt worker");
+      System.out.println("Interrupted sending message client worker");
     }
   }
 }
