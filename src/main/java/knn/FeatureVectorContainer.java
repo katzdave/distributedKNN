@@ -23,8 +23,9 @@ public class FeatureVectorContainer {
   static String VectorDelim = "-";
   static int NumWorkers = 4;
   String DELIM;
+  Boolean isTrained;
   
-  List<FeatureVector> trainingVectors;
+  List<FeatureVector> trainingVectors = null;
   
   public FeatureVectorContainer(int cores, String delim){
     trainingVectors = new ArrayList<>();
@@ -38,6 +39,10 @@ public class FeatureVectorContainer {
   
   public void setK(int k) {
     K = k;
+  }
+  
+  public Boolean isTrained() {
+    return isTrained;
   }
   
   public String GetKnnAsString(String featureVector){
@@ -77,5 +82,6 @@ public class FeatureVectorContainer {
     for (int i = 1; i != tVectors.length; i++) {
       trainingVectors.add(new FeatureVector(tVectors[i]));
     }
+    isTrained = true;
   }
 }

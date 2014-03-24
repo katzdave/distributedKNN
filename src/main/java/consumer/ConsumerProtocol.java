@@ -88,7 +88,7 @@ public class ConsumerProtocol extends Protocol {
           connectToMaster();
         break;
       case 'p':
-        if (sockets.containsKey(accumulatorId)) {
+        if (sockets.containsKey(accumulatorId) && knn.isTrained()) {
           sendMessage(accumulatorId, 
                 "a"+DELIM+msgPieces[1]+DELIM+knn.GetKnnAsString(msgPieces[2]));
         } else {

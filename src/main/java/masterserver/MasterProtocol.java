@@ -38,7 +38,7 @@ public class MasterProtocol extends Protocol {
   Integer numK;
   Integer maxConsumers;
   Integer numConsumers;
-  Boolean startedKNN;
+  Boolean hasDistributedData;
   String queryResult;
   
   Set<Integer> consumerList;
@@ -72,7 +72,7 @@ public class MasterProtocol extends Protocol {
           throws IOException, InterruptedException {
     super();
     accumulatorId = defaultAccumulatorId;
-    startedKNN = false;
+    hasDistributedData = false;
     consumerListChange = true;
     this.numK = numK;
     this.numConsumers = 0;
@@ -199,6 +199,7 @@ public class MasterProtocol extends Protocol {
       --numConsumers;
       consumerListChange = true;
       consumerConnectionData.remove(connectedID);
+      knn.markAsDropped(connectedID);
     } else if (backupsConnectionData.containsKey(connectedID) && isLeader) {
       handleBackupDisconnection(connectedID);
     } else {
@@ -260,8 +261,8 @@ public class MasterProtocol extends Protocol {
           }
           sendToNotifyList(notifyList, "a " + accumulatorInfo);
           //System.out.println(accumulatorInfo);
-          if (!startedKNN) {
-            startedKNN = true;
+          if (!hasDistributedData) {
+            hasDistributedData = true;
             knn.LoadAndDistributeTrainingDataEqually(featureVectorsFile);
           } else {
             knn.reassignDropped();
