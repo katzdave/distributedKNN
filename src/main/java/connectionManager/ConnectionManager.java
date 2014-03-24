@@ -55,12 +55,27 @@ public class ConnectionManager {
                                          outgoingMessages);
   }
   
+  public ConnectionManager(Protocol protocol) 
+          throws IOException, InterruptedException {
+    this.protocol = protocol;
+    isrunning = protocol.isrunning;
+    sockets = protocol.sockets;
+    incomingMessages = protocol.incomingMessages;
+    outgoingMessages = protocol.outgoingMessages;
+    sMessenger = new ConnectionMessenger(isrunning,
+                                         sockets,
+                                         outgoingMessages);
+    scAcceptor = null;
+  }
+  
   /**
    * starts up ConnectionAcceptor
    * continuously attempts to process queued incomingMessages
    */
   public void runManager() {
-    scAcceptor.start();
+    if (scAcceptor != null) {
+      scAcceptor.start();
+    }
     sMessenger.start();
     protocol.connect();
     System.out.println("Connection Manager running");

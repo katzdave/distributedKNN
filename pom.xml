@@ -50,7 +50,7 @@
                 <argument>20000</argument> <!-- Server Port -->
                 <argument>localhost</argument> <!-- Leader IP -->
                 <argument>20000</argument> <!-- Leader Port -->
-                <argument>2</argument> <!-- Max # Consumers -->
+                <argument>1</argument> <!-- Max # Consumers -->
                 <argument>10</argument> <!-- # K -->
                 <argument>src/main/resources/data/optdigits.tra</argument> <!-- Feature Vectors File -->
             </arguments>
@@ -73,7 +73,6 @@
         <configuration>
             <mainClass>consumer.Consumer</mainClass>
             <arguments>
-                <argument>20001</argument> <!-- Consumer Port -->
                 <argument>localhost</argument> <!-- Master IP -->
                 <argument>20000</argument> <!-- Master Port -->
             </arguments>
@@ -100,7 +99,6 @@
                 <argument>20000</argument> <!--  masterPort-->
                 <argument>src/main/resources/data/numbers.tes</argument> <!--  test file-->
                 <argument>img</argument> <!--  txt file or else-->
-                <argument>30000</argument> <!--  useless arg-->
             </arguments>
         </configuration>
     </plugin></plugins></build></profile>

@@ -86,6 +86,7 @@ public class MasterKnnWrapper {
     disconnectedList.add(id);
   }
   
+  //doesn't work yet
   public boolean reassignDropped() {
     Integer [] consumerIds = consumerConnectionData.keySet()
             .toArray(new Integer[0]);
@@ -101,8 +102,11 @@ public class MasterKnnWrapper {
             currentList = TrainingData.get(currentId);
             TrainingData.put(consumerIds[i], currentList);
             TrainingData.remove(currentId);
+            String outgoingMsg = "t";
+            System.out.println("reassigning");
             for (FeatureVector v : currentList)
-              outgoingMessages.put(new Message(consumerIds[i], "m " + v.toString()));
+              outgoingMsg += (" " + v.toString());
+            outgoingMessages.put(new Message(consumerIds[i], outgoingMsg));
           } catch (InterruptedException e) {
           }
         }

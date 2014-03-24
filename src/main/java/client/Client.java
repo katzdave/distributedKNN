@@ -9,11 +9,10 @@ public class Client {
    * args[1] - masterPort
    * args[2] - test file
    * args[3] - flag if (txt) textfile
-   * args[4] - serverPort
    * @param args 
    */
   public static void main(String [] args) {
-   if (args.length != 5) {
+   if (args.length != 4) {
       System.out.println("Invalid number of arguments");
       System.exit(1);
     }
@@ -26,7 +25,7 @@ public class Client {
             new ClientProtocol(args[0], masterPort, args[2], flag);
     ConnectionManager consumer;
     try {
-      consumer = new ConnectionManager(Integer.parseInt(args[4]), protocol);
+      consumer = new ConnectionManager(protocol);
       consumer.runManager();
     } catch (IOException ex) {
       System.err.println("Could not start up server!");

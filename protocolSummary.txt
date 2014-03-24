@@ -32,7 +32,7 @@ Master to accumulator:
 - t MAXCONSUMERS K(for top k) : tells accumulator how many consumers and k
 ==================================================
 Consumer to Master
-- c PORT : identifying message to master upon connection to master serversocket
+- c : identifying message to master upon connection to master serversocket
 
 Consumer to accumulator
 - c : identification

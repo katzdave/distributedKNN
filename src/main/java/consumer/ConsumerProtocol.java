@@ -20,7 +20,6 @@ public class ConsumerProtocol extends Protocol {
   int masterId = -1;
   int accumulatorId = -2;
   
-  Integer myServerPort;
   String masterIp;
   Integer masterPort;
   
@@ -30,11 +29,9 @@ public class ConsumerProtocol extends Protocol {
   String backupMasterString;
   FeatureVectorContainer knn;
   
-  public ConsumerProtocol(int myServerPort, 
-                          String masterIp, 
+  public ConsumerProtocol(String masterIp, 
                           int masterPort,
                           int numCores) {
-    this.myServerPort = myServerPort;
     this.masterIp = masterIp;
     this.masterPort = masterPort;
     knn = new FeatureVectorContainer(numCores, DELIM);
@@ -59,7 +56,7 @@ public class ConsumerProtocol extends Protocol {
   @Override
   public void processManagerMessages(Message message) {
     String[] msgPieces = message.message.split(DELIM);
-    //System.out.println("Got message" + message.message);
+    System.out.println("Got message " + message.message);
     switch (msgPieces[0].charAt(0)) {
       case 'b':
         backupMasterString = message.message;
@@ -137,9 +134,9 @@ public class ConsumerProtocol extends Protocol {
       masterIp = nextMaster[0];
       masterPort = Integer.parseInt(nextMaster[1]);
       if (disMessagePieces.length == 3)
-        backupMasterString = "m " + disMessagePieces[2];
+        backupMasterString = "b " + disMessagePieces[2];
       else if (disMessagePieces.length == 2)
-        backupMasterString = "m";
+        backupMasterString = "b";
       connectToMaster();
       if (sockets.containsKey(masterId))
         resolved = true;
@@ -169,7 +166,7 @@ public class ConsumerProtocol extends Protocol {
                                             masterStream,
                                             this);
       connection.start();
-      sendMessage(masterId, "c " + myServerPort);
+      sendMessage(masterId, "c");
     } catch (IOException ex) {
       System.err.println("Couldn't connect to master!");
     }
@@ -191,7 +188,7 @@ public class ConsumerProtocol extends Protocol {
       connection.start();
       sendMessage(accumulatorId, "c");
     } catch (IOException ex) {
-      System.err.println("Couldn't connect to master!");
+      System.err.println("Couldn't connect to Accumulator!");
     }
   }
   

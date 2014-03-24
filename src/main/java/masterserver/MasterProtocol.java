@@ -109,7 +109,7 @@ public class MasterProtocol extends Protocol {
     //System.out.println("Processing message from " + incomingMessage.connectedID + ": " + incomingMessage.message);
     switch(messagePieces[0].charAt(0)) {
       case 'r':
-        //System.out.println("Received producer request to be paired");
+        System.out.println("Received producer request to be paired");
         sendVectorToConsumers(incomingMessage.connectedID, 
                 messagePieces[1]);
         break;
@@ -151,7 +151,8 @@ public class MasterProtocol extends Protocol {
         if (testDataToProducer.containsKey(testedId)
                 && sockets.containsKey(testDataToProducer.get(testedId))) {
           //System.out.println("Sending to: " + testDataToProducer.get(testedId) + DELIM + testedId + DELIM + messagePieces[2]);
-          sendMessage(testDataToProducer.get(testedId), "q " + testedId + DELIM + messagePieces[2]);   
+          sendMessage(testDataToProducer.get(testedId), 
+                  "q " + testedId + DELIM + messagePieces[2]);   
         }
         break;
       default:
@@ -244,9 +245,7 @@ public class MasterProtocol extends Protocol {
         }
         ++numConsumers;
         consumerListChange = true;
-        connectionData = 
-                (cSocket.getInetAddress().getHostAddress().toString() 
-                + DELIM2 + acceptorMessagePieces[1]);
+        connectionData = (cSocket.getInetAddress().getHostAddress().toString());
         consumerConnectionData.put(numConnections, connectionData);
         //send out backup string k and numK
         sendMessage(numConnections, backupString);
@@ -286,7 +285,10 @@ public class MasterProtocol extends Protocol {
           Set<Integer> notifyList = consumerConnectionData.keySet();
           sendToNotifyList(notifyList, "a " + accumulatorInfo);
         }
-        sendMessage(numConnections, backupString);
+        if (backupString.length() > 1)
+          sendMessage(numConnections, backupString.substring(1));
+        else
+          sendMessage(numConnections, "m");
         break;
       case 's':
         connectionData = (cSocket.getInetAddress().getHostAddress().toString() 
@@ -367,6 +369,7 @@ public class MasterProtocol extends Protocol {
   
   void sendToNotifyList(Set<Integer> notifyList, String message) {
     for (Integer i : notifyList) {
+      if (i != accumulatorId)
         sendMessage(i, message);
     }
   }

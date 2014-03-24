@@ -9,34 +9,27 @@ import java.io.IOException;
  */
 public class Consumer {
   /**
-   * args[0] - myServerPort
-   * args[1] - masterIp
-   * args[2] - masterPort
+   * args[0] - masterIp
+   * args[1] - masterPort
    * @param args 
    */
   public static void main(String [] args) {
-   if (args.length != 3) {
+   if (args.length != 2) {
       System.out.println("Invalid number of arguments");
       System.exit(1);
     }
     int numCores = Runtime.getRuntime().availableProcessors();
-    Integer myServerPort, masterPort;
-    myServerPort = Integer.parseInt(args[0]);
-    masterPort = Integer.parseInt(args[2]);
+    Integer masterPort = Integer.parseInt(args[1]);
     ConsumerProtocol protocol = 
             new ConsumerProtocol(
-                    myServerPort, 
-                    args[1], 
+                    args[0], 
                     masterPort,
                     numCores);
     ConnectionManager consumer;
     try {
-      consumer = new ConnectionManager(myServerPort, 
-                                          protocol);
+      consumer = new ConnectionManager(protocol);
       consumer.runManager();
-    } catch (IOException ex) {
-      System.err.println("Could not start up server!");
-    } catch (InterruptedException ex) {
+    } catch (IOException | InterruptedException ex) {
       System.err.println("Could not start up server!");
     }
   }
