@@ -11,6 +11,8 @@ Master broadcasts to consumers
 Consumers compute euclidean distance, send top k results to aggregator
 Aggregator compiles the results and returns the top k
 Aggregator finds most frequent and sends to master ID and category
+Master sends results back to consumer
+Consumer writes results to file
 
 To compile:
 make
