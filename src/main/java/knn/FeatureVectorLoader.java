@@ -124,7 +124,7 @@ public class FeatureVectorLoader {
       PrintWriter out = new PrintWriter(new FileWriter(outFile), true);
       int i=0;
       for(FeatureVector vector : vectors){
-        Integer key = i++;
+        Integer key = testData.get(vector);
         String value = res.get(key);
         String fullImgPath = br.readLine();
         String[] parts = fullImgPath.split("/");
