@@ -32,6 +32,8 @@ public class ClientProtocol extends Protocol {
   HashMap<Integer, String> TestResult;
   int amtData = 0;
   int amtResult = 0;
+
+  static long timer;
   
   public ClientProtocol(String masterIp, int masterPort,
           String testFile, Boolean fileTypeFlag) {
@@ -62,7 +64,7 @@ public class ClientProtocol extends Protocol {
   @Override
   public void processManagerMessages(Message message) {
     String[] msgPieces = message.message.split(DELIM);
-    System.err.println(message.message);
+    //System.err.println(message.message);
     switch (msgPieces[0].charAt(0)) {
       case 'b':
         break;
@@ -85,7 +87,8 @@ public class ClientProtocol extends Protocol {
             fvl.ExportCurrentResultsToFile("./src/main/resources/data/numbers.html"
                                     ,testFile,TestData,TestResult);
           }
-          System.out.println("Test complete!");
+	  timer = System.currentTimeMillis()-timer;
+          System.out.println("Done: " + timer);
           System.exit(0);
         }
         break;
@@ -151,6 +154,7 @@ public class ClientProtocol extends Protocol {
   @Override
   public void connect() {
     connectToMaster();
+    timer = System.currentTimeMillis();
   }
   
 }

@@ -158,7 +158,7 @@ public class AccumulatorProtocol extends Protocol{
   @Override
   public void processManagerMessages(Message message) {
     String[] msgPieces = message.message.split(DELIM);
-    System.err.println("Got message: " + message.message);
+    //System.err.println("Got message: " + message.message);
     switch (msgPieces[0].charAt(0)) {
       case 'a':
         //consumer to me
