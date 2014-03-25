@@ -8,6 +8,7 @@ package knn;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 
 /**
  * Stores the category and information about all features
@@ -81,14 +82,21 @@ public class FeatureVector{
     return out + Category;
   }
 
-  // @Override
-  // public boolean equals(Object oth){
-  //   FeatureVector other = (FeatureVector) oth;
-  //   for(int i=0; i<NumFeatures; i++){
-  //     if(this.Features[i] != other.Features[1]){
-  //       return false;
-  //     }
-  //   }
-  //   return true;
-  // }
+   @Override
+   public boolean equals(Object oth){
+     FeatureVector other = (FeatureVector) oth;
+     for(int i=0; i<NumFeatures; i++){
+       if(this.Features[i] != other.Features[1]){
+         return false;
+       }
+     }
+     return true;
+   }
+
+  @Override
+  public int hashCode() {
+    int hash = 3;
+    hash = 89 * hash + Arrays.deepHashCode(this.Features);
+    return hash;
+  }
 }
