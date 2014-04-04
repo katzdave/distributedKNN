@@ -58,7 +58,7 @@ public class ConsumerProtocol extends Protocol {
   @Override
   public void processManagerMessages(Message message) {
     String[] msgPieces = message.message.split(DELIM);
-    //System.out.println("Got message " + message.message);
+    System.out.println("Got message " + message.message);
     switch (msgPieces[0].charAt(0)) {
       case 'b':
         backupMasterString = message.message;

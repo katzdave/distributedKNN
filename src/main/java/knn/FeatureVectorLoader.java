@@ -73,46 +73,56 @@ public class FeatureVectorLoader {
                         HashMap<FeatureVector,Integer> testData,
                         HashMap<Integer,String> res){
     int[][] results = new int[10][10];
+    double correct = 0;
+    double total = 0;
     for (int[] row : results)
       Arrays.fill(row, 0);
     for (Map.Entry<FeatureVector, Integer> entry : testData.entrySet()) {
       Integer key = entry.getValue();
       String learnedValue = res.get(key);
       String knownValue = entry.getKey().Category;
-      if(learnedValue != null && knownValue != null){
-        results[Integer.parseInt(knownValue)][Integer.parseInt(learnedValue)]++;
+      if(learnedValue.equals(knownValue)){
+        correct = correct + 1;
       }
+      total = total + 1;
     }
-    int totalCorrect = 0;
-    int total = 0;
-    for(int i=0; i<10; i++){
-      for(int j=0; j<10; j++){
-        if(i == j){
-          totalCorrect += results[i][j];
-        }
-        total += results[i][j];
-      }
-    }
-    double overallAccuracy = (double)totalCorrect * 100 / (double)total;
+
+    System.out.println("Percent acc = " + correct/total);
+
+    //   if(learnedValue != null && knownValue != null){
+    //     results[Integer.parseInt(knownValue)][Integer.parseInt(learnedValue)]++;
+    //   }
+    // }
+    // int totalCorrect = 0;
+    // int total = 0;
+    // for(int i=0; i<10; i++){
+    //   for(int j=0; j<10; j++){
+    //     if(i == j){
+    //       totalCorrect += results[i][j];
+    //     }
+    //     total += results[i][j];
+    //   }
+    // }
+    // double overallAccuracy = (double)totalCorrect * 100 / (double)total;
     
-    try{
-      PrintWriter out = new PrintWriter(new FileWriter(outFile), true);
-      out.write(String.format(
-              "%d Total Results, %d Correct: %.2f Percent Accuracy\n\n",
-              total, totalCorrect, overallAccuracy));
-      out.write("Confusion matrix: Rows actual, Columns predicted\n");
-      out.write("\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t\n");
-      for(int i=0; i<10; i++){
-        out.print(i + "\t");
-        for(int j=0; j<10; j++){
-          out.write(results[i][j] + "\t");
-        }
-        out.write("\n");
-      }
-      out.close();
-    }catch(IOException e){
-      System.out.println("Unable to write to output file");
-    }
+    // try{
+    //   PrintWriter out = new PrintWriter(new FileWriter(outFile), true);
+    //   out.write(String.format(
+    //           "%d Total Results, %d Correct: %.2f Percent Accuracy\n\n",
+    //           total, totalCorrect, overallAccuracy));
+    //   out.write("Confusion matrix: Rows actual, Columns predicted\n");
+    //   out.write("\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t\n");
+    //   for(int i=0; i<10; i++){
+    //     out.print(i + "\t");
+    //     for(int j=0; j<10; j++){
+    //       out.write(results[i][j] + "\t");
+    //     }
+    //     out.write("\n");
+    //   }
+    //   out.close();
+    // }catch(IOException e){
+    //   System.out.println("Unable to write to output file");
+    // }
   }
 
   public void ExportCurrentResultsToFile(String outFile, String inFile,

@@ -15,7 +15,7 @@ import java.util.Arrays;
  * @author David
  */
 public class FeatureVector{
-  static int NumFeatures = 64;
+  static int NumFeatures = 32;
   static String Delim = ",";
   
   Feature[] Features;
