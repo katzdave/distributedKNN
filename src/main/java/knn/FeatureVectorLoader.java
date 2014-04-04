@@ -71,23 +71,26 @@ public class FeatureVectorLoader {
 
   public void ExportCurrentResultsToFile(String outFile,
                         HashMap<FeatureVector,Integer> testData,
-                        HashMap<Integer,String> res){
-    int[][] results = new int[10][10];
-    double correct = 0;
-    double total = 0;
-    for (int[] row : results)
-      Arrays.fill(row, 0);
-    for (Map.Entry<FeatureVector, Integer> entry : testData.entrySet()) {
-      Integer key = entry.getValue();
-      String learnedValue = res.get(key);
-      String knownValue = entry.getKey().Category;
-      if(learnedValue.equals(knownValue)){
-        correct = correct + 1;
-      }
-      total = total + 1;
-    }
-
-    System.out.println("Percent acc = " + correct/total);
+                        HashMap<Integer,CategoryLikelihoodContainer> res){
+    System.out.println("Made it to export no bugs?");
+    
+    
+//    int[][] results = new int[10][10];
+//    double correct = 0;
+//    double total = 0;
+//    for (int[] row : results)
+//      Arrays.fill(row, 0);
+//    for (Map.Entry<FeatureVector, Integer> entry : testData.entrySet()) {
+//      Integer key = entry.getValue();
+//      String learnedValue = res.get(key);
+//      String knownValue = entry.getKey().Category;
+//      if(learnedValue.equals(knownValue)){
+//        correct = correct + 1;
+//      }
+//      total = total + 1;
+//    }
+//
+//    System.out.println("Percent acc = " + correct/total);
 
     //   if(learnedValue != null && knownValue != null){
     //     results[Integer.parseInt(knownValue)][Integer.parseInt(learnedValue)]++;
@@ -127,24 +130,24 @@ public class FeatureVectorLoader {
 
   public void ExportCurrentResultsToFile(String outFile, String inFile,
                         HashMap<FeatureVector,Integer> testData,
-                        HashMap<Integer,String> res){
-    List<FeatureVector> vectors = FeatureVectorsFromImageFileList(inFile);
-    try{
-      BufferedReader br = new BufferedReader(new FileReader(inFile));
-      PrintWriter out = new PrintWriter(new FileWriter(outFile), true);
-      int i=0;
-      for(FeatureVector vector : vectors){
-        Integer key = testData.get(vector);
-        String value = res.get(key);
-        String fullImgPath = br.readLine();
-        String[] parts = fullImgPath.split("/");
-        String imgname = parts[parts.length-1];
-        out.write("<img src=\"./numbers/" + imgname + "\">= " + value + "<br>\n");
-      }
-      out.close();
-      br.close();
-    }catch(IOException e){
-      System.err.println("Error writing to output file");
-    }
+                        HashMap<Integer,CategoryLikelihoodContainer> res){
+//    List<FeatureVector> vectors = FeatureVectorsFromImageFileList(inFile);
+//    try{
+//      BufferedReader br = new BufferedReader(new FileReader(inFile));
+//      PrintWriter out = new PrintWriter(new FileWriter(outFile), true);
+//      int i=0;
+//      for(FeatureVector vector : vectors){
+//        Integer key = testData.get(vector);
+//        String value = res.get(key);
+//        String fullImgPath = br.readLine();
+//        String[] parts = fullImgPath.split("/");
+//        String imgname = parts[parts.length-1];
+//        out.write("<img src=\"./numbers/" + imgname + "\">= " + value + "<br>\n");
+//      }
+//      out.close();
+//      br.close();
+//    }catch(IOException e){
+//      System.err.println("Error writing to output file");
+//    }
   }
 }

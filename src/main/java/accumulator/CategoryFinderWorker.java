@@ -9,6 +9,7 @@ package accumulator;
 import connectionManager.Message;
 import java.util.concurrent.BlockingQueue;
 import knn.CategoryFinder;
+import knn.CategoryLikelihoodContainer;
 
 /**
  *
@@ -31,12 +32,27 @@ public class CategoryFinderWorker implements Runnable{
     MasterId = masterId;
   }
   
+//  @Override
+//  public void run() {
+//    MyCategoryFinder.AddListFromString(Message);
+//    if(MyCategoryFinder.CheckIfAllMessagesReceived()){
+//      String category = MyCategoryFinder.GetCategory();
+//      String toSend = "d " + MyCategoryFinder.ID + " " + category;
+//      try{
+//        Outgoing.put(new Message(MasterId, toSend));
+//        //System.err.println("sending to master: " + toSend);
+//      }catch(InterruptedException e){
+//        System.err.println("Failed to send message to master");
+//      }
+//    }
+//  }
+  
   @Override
   public void run() {
     MyCategoryFinder.AddListFromString(Message);
     if(MyCategoryFinder.CheckIfAllMessagesReceived()){
-      String category = MyCategoryFinder.GetCategory();
-      String toSend = "d " + MyCategoryFinder.ID + " " + category;
+      CategoryLikelihoodContainer clc = MyCategoryFinder.GetCategoryLikelihood();
+      String toSend = "d " + MyCategoryFinder.ID + " " + clc.toString();
       try{
         Outgoing.put(new Message(MasterId, toSend));
         //System.err.println("sending to master: " + toSend);

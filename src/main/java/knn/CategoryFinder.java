@@ -81,4 +81,27 @@ public class CategoryFinder {
     }
     return cat;
   }
+  
+  public CategoryLikelihoodContainer GetCategoryLikelihood(){
+    HashMap<String,Integer> counts = new HashMap<>();    
+    for(int i=0; i<K; i++){
+      CategoryDistances cd = Matches.poll();
+      if(cd == null){
+        break;
+      }
+      if(counts.containsKey(cd.Category)){
+        Integer tmp = counts.get(cd.Category);
+        counts.put(cd.Category, new Integer(tmp.intValue()+1));
+      }else{
+        counts.put(cd.Category, new Integer(1));
+      }
+    }
+    CategoryLikelihoodContainer clc = new CategoryLikelihoodContainer();
+    for (Map.Entry<String, Integer> entry : counts.entrySet()) {
+      int value = entry.getValue().intValue();
+      clc.AddCategoryLikelihood(new CategoryLikelihood(
+              entry.getKey(),((double)value)/K));
+    }
+    return clc;
+  }
 }

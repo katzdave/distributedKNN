@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.HashMap;
+import knn.CategoryLikelihoodContainer;
 import knn.FeatureVector;
 import knn.FeatureVectorLoader;
 
@@ -29,7 +30,7 @@ public class ClientProtocol extends Protocol {
   String backupMasterString;
   
   HashMap<FeatureVector, Integer> TestData;
-  HashMap<Integer, String> TestResult;
+  HashMap<Integer, CategoryLikelihoodContainer> TestResult;
   int amtData = 0;
   int amtResult = 0;
 
@@ -75,7 +76,8 @@ public class ClientProtocol extends Protocol {
         amtData++;
         break;
       case 'q':
-        TestResult.put(Integer.parseInt(msgPieces[1]), msgPieces[2]);
+        TestResult.put(Integer.parseInt(msgPieces[1]),
+                new CategoryLikelihoodContainer(msgPieces[2]));
         amtResult++;
         if(amtData == amtResult){
           if(fileTypeFlag){
@@ -87,7 +89,7 @@ public class ClientProtocol extends Protocol {
             fvl.ExportCurrentResultsToFile("./src/main/resources/data/numbers.html"
                                     ,testFile,TestData,TestResult);
           }
-	  timer = System.currentTimeMillis()-timer;
+          timer = System.currentTimeMillis()-timer;
           System.out.println("Done: " + timer);
           System.exit(0);
         }
