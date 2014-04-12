@@ -72,7 +72,16 @@ public class FeatureVectorLoader {
   public void ExportCurrentResultsToFile(String outFile,
                         HashMap<FeatureVector,Integer> testData,
                         HashMap<Integer,CategoryLikelihoodContainer> res){
-    System.out.println("Made it to export no bugs?");
+    try(PrintWriter out = new PrintWriter(new FileWriter(outFile), true)){
+      for(Map.Entry<FeatureVector,Integer> entry : testData.entrySet()){
+        Integer key = entry.getValue();
+        String knownValue = entry.getKey().Category;
+        CategoryLikelihoodContainer clc = res.get(key);
+        out.println(knownValue + " " + clc.toString());
+      }
+    } catch(IOException e){
+      System.out.println("invalid file");
+    }
     
     
 //    int[][] results = new int[10][10];
