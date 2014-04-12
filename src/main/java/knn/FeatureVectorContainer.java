@@ -19,7 +19,7 @@ import java.util.concurrent.PriorityBlockingQueue;
  * @author David
  */
 public class FeatureVectorContainer {
-  static int K = 5;
+  static int K = 100;
   static String VectorDelim = "-";
   static int NumWorkers = 4;
   String DELIM;
