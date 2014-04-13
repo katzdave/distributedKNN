@@ -82,7 +82,7 @@ public class ClientProtocol extends Protocol {
         if(amtData == amtResult){
           if(fileTypeFlag){
             FeatureVectorLoader fvl = new FeatureVectorLoader();
-            fvl.ExportCurrentResultsToFile("./src/main/resources/data/optdigits.res"
+            fvl.ExportCurrentResultsToFile("./src/main/resources/data/categoryliklihood.res"
                                     ,TestData,TestResult);
           }else{
             FeatureVectorLoader fvl = new FeatureVectorLoader();
