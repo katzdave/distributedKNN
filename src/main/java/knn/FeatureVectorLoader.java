@@ -77,7 +77,7 @@ public class FeatureVectorLoader {
         Integer key = entry.getValue();
         String knownValue = entry.getKey().Category;
         CategoryLikelihoodContainer clc = res.get(key);
-        out.println(knownValue + " " + clc.toString());
+        out.println(entry.getKey().toString() + " " + clc.toString());
       }
     } catch(IOException e){
       System.out.println("invalid file");
