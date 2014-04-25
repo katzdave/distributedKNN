@@ -50,9 +50,9 @@
                 <argument>20000</argument> <!-- Server Port -->
                 <argument>localhost</argument> <!-- Leader IP -->
                 <argument>20000</argument> <!-- Leader Port -->
-                <argument>5</argument> <!-- Max # Consumers -->
+                <argument>1</argument> <!-- Max # Consumers -->
                 <argument>50</argument> <!-- # K -->
-                <argument>src/main/resources/data/trainFile2.txt</argument> <!-- Feature Vectors File -->
+                <argument>src/main/resources/data/trainSummed.txt</argument> <!-- Feature Vectors File -->
             </arguments>
         </configuration>
     </plugin></plugins></build></profile>
@@ -73,7 +73,7 @@
         <configuration>
             <mainClass>consumer.Consumer</mainClass>
             <arguments>
-                <argument>ice03.ee.cooper.edu</argument> <!-- Master IP -->
+                <argument>localhost</argument> <!-- Master IP -->
                 <argument>20000</argument> <!-- Master Port -->
             </arguments>
         </configuration>
@@ -95,9 +95,9 @@
         <configuration>
             <mainClass>client.Client</mainClass>
             <arguments>
-                <argument>ice03.ee.cooper.edu</argument> <!--  masterIp-->
+                <argument>localhost</argument> <!--  masterIp-->
                 <argument>20000</argument> <!--  masterPort-->
-                <argument>src/main/resources/data/testFile2.txt</argument> <!--  test file-->
+                <argument>src/main/resources/data/testSummed.txt</argument> <!--  test file-->
                 <argument>txt</argument> <!--  txt file or else-->
             </arguments>
         </configuration>
@@ -122,7 +122,7 @@
                 <argument>25000</argument> <!-- serverPort -->
                 <argument>localhost</argument> <!--  leaderAccumulatorIP -->
                 <argument>25000</argument> <!-- leaderPort -->
-                <argument>ice03.ee.cooper.edu</argument> <!-- masterIp -->
+                <argument>localhost</argument> <!-- masterIp -->
                 <argument>20000</argument> <!-- masterPort -->
             </arguments>
         </configuration>
